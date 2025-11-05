@@ -1518,8 +1518,16 @@
                 console.log('Response status:', response.status);
                 console.log('Response headers:', [...response.headers.entries()]);
 
-                const result = await response.json();
-                console.log('Response body:', result);
+                let result;
+                try {
+                    const responseText = await response.text();
+                    console.log('Raw response text:', responseText);
+                    result = JSON.parse(responseText);
+                    console.log('Parsed response body:', result);
+                } catch (parseError) {
+                    console.error('Failed to parse response:', parseError);
+                    throw new Error('Sunucudan geçersiz yanıt alındı. Lütfen daha sonra tekrar deneyin.');
+                }
 
                 hideLoading();
 
