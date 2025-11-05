@@ -1,0 +1,19 @@
+name: Deploy Frontend to Server
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy Frontend to VPS
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /var/www/satinalmacopilot-frontend
+            git pull origin main
+            sudo nginx -s reload
+            echo "Frontend updated successfully"

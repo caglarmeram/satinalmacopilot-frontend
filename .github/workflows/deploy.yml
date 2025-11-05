@@ -1,0 +1,23 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Deploy to server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            echo "Starting deployment..."
+            cd /root/satinalmacopilot-backend
+            pm2 restart satinalmacopilot-api || pm2 start ecosystem.config.js
+            echo "Backend deployment completed at $(date)"

@@ -1,342 +1,475 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Ödeme - Satınalma CoPilot</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Satınalma CoPilot – Ödeme</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://js.stripe.com/v3/"></script>
   <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-    .container{max-width:1200px;width:100%}
-    .payment-wrapper{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
-    .card{background:#fff;border-radius:20px;padding:40px;box-shadow:0 20px 40px rgba(0,0,0,.1)}
-    .card-header{text-align:center;margin-bottom:30px}
-    .card-title{font-size:2rem;font-weight:700;color:#1e293b;margin-bottom:8px}
-    .card-subtitle{color:#64748b;font-size:1.1rem}
-
-    .plan-card{background:linear-gradient(135deg,#dbeafe 0%,#bfdbfe 100%);border-radius:12px;padding:24px;margin-bottom:24px;border-left:4px solid #2563eb}
-    .plan-name{font-size:1.5rem;font-weight:700;color:#1e293b;margin-bottom:8px}
-    .plan-price{font-size:2rem;font-weight:800;color:#2563eb;margin-bottom:8px}
-    .features-list{list-style:none;margin-top:16px}
-    .features-list li{display:flex;align-items:center;gap:8px;padding:4px 0;color:#475569;font-size:.9rem}
-
-    .selector{display:flex;gap:8px;margin:12px 0 20px}
-    .segmented{display:inline-flex;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden}
-    .segmented button{padding:10px 14px;border:none;background:#fff;color:#334155;font-weight:600;cursor:pointer}
-    .segmented button.active{background:#1d4ed8;color:#fff}
-    .pill{border:1px solid #e2e8f0;border-radius:999px;padding:6px 10px;font-size:.8rem;color:#475569}
-
-    .plans-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:10px}
-    .planOption{border:2px solid #e2e8f0;border-radius:12px;padding:14px;cursor:pointer;background:#fff}
-    .planOption.active{border-color:#1d4ed8;box-shadow:0 0 0 3px rgba(29,78,216,.12)}
-    .planOption h4{margin-bottom:4px;color:#0f172a}
-    .planOption p{font-size:.9rem;color:#475569}
-
-    .info-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #f1f5f9}
-    .info-item:last-child{border-bottom:none}
-    .label{color:#64748b;font-weight:500}
-    .value{color:#1e293b;font-weight:600}
-
-    .payment-method{border:2px solid #2563eb;background:#f8faff;border-radius:12px;padding:20px;text-align:center;margin-bottom:20px}
-    .method-icon{font-size:2rem;margin-bottom:8px}
-    .method-name{font-weight:600;color:#1e293b;margin-bottom:4px}
-
-    .summary-section{background:#f8fafc;border-radius:12px;padding:20px;margin-bottom:30px}
-    .summary-title{font-weight:600;color:#1e293b;margin-bottom:16px}
-    .summary-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #e2e8f0}
-    .summary-item:last-child{border-bottom:none;font-weight:600;font-size:1.1rem;color:#1e293b;margin-top:8px;padding-top:16px;border-top:2px solid #e2e8f0}
-
-    .pay-button{width:100%;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border:none;padding:16px 24px;border-radius:12px;font-size:1.1rem;font-weight:600;cursor:pointer;transition:all .3s ease;margin-bottom:16px}
-    .pay-button:hover{background:linear-gradient(135deg,#1d4ed8,#1e40af);transform:translateY(-2px)}
-    .pay-button:disabled{background:#94a3b8;cursor:not-allowed;transform:none}
-
-    .security-note{text-align:center;color:#64748b;font-size:.9rem;line-height:1.5}
-    .back-link{text-align:center;margin-top:20px}
-    .back-link a{color:#2563eb;text-decoration:none;font-weight:500}
-
-    .loading-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:9999}
-    .loading-content{background:#fff;padding:40px;border-radius:20px;text-align:center}
-    .spinner{width:40px;height:40px;border:4px solid #f3f4f6;border-top:4px solid #2563eb;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 20px}
-    @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
-
-    .error-message{background:#fee2e2;border:1px solid #f87171;border-radius:8px;padding:20px;margin:20px 0;text-align:center;color:#dc2626}
-
-    @media (max-width:768px){
-      .payment-wrapper{grid-template-columns:1fr;gap:20px}
-      .card{padding:24px}
-      .plans-grid{grid-template-columns:1fr}
-    }
+    :root { --bg:#0b1220; --card:#101a2f; --muted:#93a4bf; --text:#e9eef8; --primary:#4f8cff; --ok:#19c37d; --warn:#f6a609; --danger:#ff6b6b; }
+    * { box-sizing:border-box; margin:0; padding:0 }
+    body { font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial; background:linear-gradient(160deg,#0b1220,#0d1325,#0a0f1c); color:var(--text); }
+    .wrap { max-width:1100px; margin:0 auto; padding:24px; }
+    .header { display:flex; align-items:center; gap:12px; margin-bottom:20px }
+    .logo { width:44px; height:44px; border-radius:12px; background:#121d35; display:grid; place-items:center; font-weight:800; color:#9cc0ff; font-size:20px }
+    h1 { font-size:26px; margin:10px 0 2px }
+    .muted { color:var(--muted); font-size:14px }
+    .grid { margin-top:24px; display:grid; grid-template-columns:1.2fr 1fr; gap:20px }
+    @media (max-width:900px){ .grid{ grid-template-columns:1fr } }
+    .card { background:linear-gradient(180deg,#0f1930,#0d172b); border:1px solid #1f2a44; border-radius:16px; padding:18px; box-shadow:0 8px 30px rgba(0,0,0,.25) }
+    .secTitle { font-weight:700; font-size:16px; margin:16px 0 10px }
+    .secTitle:first-child { margin-top:0 }
+    label { display:block; font-size:13px; color:var(--muted); margin:10px 0 6px }
+    input,select { width:100%; background:#0b1326; border:1px solid #1e2b48; color:var(--text); padding:10px 12px; border-radius:10px; outline:none; font-size:14px }
+    input:focus { border-color:#355aa5; box-shadow:0 0 0 2px rgba(79,140,255,.15) }
+    .plans { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:10px }
+    @media (max-width:900px){ .plans { grid-template-columns:1fr } }
+    .plan { border:1px solid #1f2a44; border-radius:14px; padding:14px; background:#0f1830; cursor:pointer; position:relative; transition:all .2s }
+    .plan:hover { border-color:#355aa5 }
+    .plan[data-selected="true"] { outline:2px solid var(--primary); box-shadow:0 0 0 4px rgba(79,140,255,.15) inset }
+    .planTitle { font-weight:700; font-size:15px }
+    .price { font-size:22px; font-weight:800; margin-top:6px; color:#9cc0ff }
+    .quota { font-size:12px; color:#a9b7d3; margin-top:4px }
+    .billToggle { display:flex; gap:8px; align-items:center; margin-top:8px }
+    .switch { position:relative; width:56px; height:30px; background:#172242; border-radius:999px; border:1px solid #24335a; cursor:pointer; transition:.3s }
+    .switch::after { content:""; position:absolute; top:3px; left:3px; width:24px; height:24px; background:#eaf1ff; border-radius:50%; transition:.2s }
+    .switch[data-mode="yearly"]::after { left:29px }
+    .badge { font-size:11px; padding:3px 8px; border-radius:999px; background:#13224a; color:#9fc2ff; border:1px solid #2a3f76; font-weight:600 }
+    .summaryRow { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed #1f2a44; font-size:14px }
+    .summaryRow:last-child { border-bottom:0; font-weight:700; font-size:16px; color:#9cc0ff }
+    .cta { width:100%; margin-top:14px; padding:14px 16px; font-weight:800; border-radius:12px; border:0; background:linear-gradient(135deg,#568dff,#3a6ee8); color:white; cursor:pointer; font-size:15px; transition:all .3s }
+    .cta:hover:not([disabled]) { transform:translateY(-2px); box-shadow:0 8px 20px rgba(79,140,255,.4) }
+    .cta[disabled] { opacity:.6; cursor:not-allowed }
+    .banner { display:none; border:1px solid #3a2a1a; background:linear-gradient(180deg,#2a1b10,#23160e); color:#ffd9a8; padding:12px; border-radius:10px; margin:10px 0; font-size:14px }
+    .banner.show { display:block }
+    .foot { margin-top:30px; font-size:12px; color:#7f8fb1; text-align:center }
+    .loading-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(11,18,32,.9); display:none; align-items:center; justify-content:center; z-index:9999 }
+    .loading-content { background:var(--card); padding:40px; border-radius:16px; text-align:center; border:1px solid #1f2a44 }
+    .spinner { width:40px; height:40px; border:3px solid #1e2b48; border-top:3px solid var(--primary); border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 20px }
+    @keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+    .info-box { margin-top:20px; padding:12px; background:rgba(25,195,125,.1); border:1px solid rgba(25,195,125,.2); border-radius:8px; font-size:12px; color:#19c37d; line-height:1.6 }
+    .info-box strong { color:#19c37d }
+    #statusMsg { margin-top:10px; font-size:13px; min-height:20px }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="payment-wrapper">
-      <!-- Sol: Kullanıcı / Plan kartı -->
-      <div class="card">
-        <div class="card-header">
-          <h1 class="card-title">🤖 Satınalma CoPilot</h1>
-          <p class="card-subtitle">Plan Yükseltme & Ödeme</p>
-        </div>
-
-        <!-- Faturalama seçici -->
-        <div>
-          <div class="selector" aria-label="Faturalama sıklığı">
-            <div class="segmented" id="billingToggle">
-              <button data-billing="monthly" class="active">Aylık</button>
-              <button data-billing="yearly">Yıllık <span class="pill" style="margin-left:6px">🟢 avantajlı</span></button>
-            </div>
-          </div>
-
-          <!-- Plan kartları -->
-          <div class="plans-grid" id="planOptions">
-            <div class="planOption" data-plan="basic">
-              <h4>Basic</h4>
-              <p id="p-basic">—</p>
-            </div>
-            <div class="planOption active" data-plan="pro">
-              <h4>Pro</h4>
-              <p id="p-pro">—</p>
-            </div>
-            <div class="planOption" data-plan="max">
-              <h4>Max</h4>
-              <p id="p-max">—</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Özet kartı -->
-        <div class="plan-card" id="planCard">
-          <div class="plan-name" id="planName">Plan Yükleniyor...</div>
-          <div class="plan-price" id="planPrice">$0.00/ay</div>
-          <ul class="features-list" id="planFeatures"></ul>
-        </div>
-
-        <div id="userInfo">
-          <div class="info-item"><span class="label">Ad Soyad:</span><span class="value" id="userName">Yükleniyor...</span></div>
-          <div class="info-item"><span class="label">Şirket:</span><span class="value" id="companyName">Yükleniyor...</span></div>
-          <div class="info-item"><span class="label">WhatsApp:</span><span class="value" id="phoneNumber">Yükleniyor...</span></div>
-          <div class="info-item"><span class="label">Mevcut Plan:</span><span class="value" id="currentPlan">Yükleniyor...</span></div>
-        </div>
-
-        <div class="success-message" style="background:#dcfce7;border:1px solid #10b981;border-radius:8px;padding:16px;margin-top:20px;color:#065f46">
-          ⚡ Ödeme sonrası WhatsApp asistanınız anında aktifleşir!
-        </div>
-      </div>
-
-      <!-- Sağ: Ödeme kartı -->
-      <div class="card">
-        <div class="card-header">
-          <h2 class="card-title">Güvenli Ödeme</h2>
-          <p class="card-subtitle">Planınızı hemen aktifleştirin</p>
-        </div>
-
-        <div class="payment-method">
-          <div class="method-icon">💳</div>
-          <div class="method-name">Stripe / Kart Ödeme</div>
-          <div style="font-size:.85rem;color:#64748b;margin-top:8px">Visa, Mastercard - Tüm kartlar desteklenir</div>
-        </div>
-
-        <div class="summary-section">
-          <h4 class="summary-title">Sipariş Özeti</h4>
-          <div class="summary-item"><span>Plan:</span><span id="summaryPlan">Yükleniyor...</span></div>
-          <div class="summary-item"><span>Süre:</span><span id="summaryDuration">-</span></div>
-          <div class="summary-item"><span>Mesaj Kotası:</span><span id="summaryQuota">-</span></div>
-          <div class="summary-item"><span>USD Fiyat:</span><span id="summaryUSD">$0.00</span></div>
-        </div>
-
-        <button class="pay-button" id="payButton" disabled>
-          <span id="payButtonText">Ödemeyi Başlat</span>
-        </button>
-
-        <div class="security-note">
-          🔒 Ödemeleriniz SSL ile şifrelenir<br>
-          💳 Abonelik yönetimi Stripe Portal’dan<br>
-          💬 WhatsApp OTP ile hızlı giriş
-        </div>
-
-        <div class="back-link"><a href="index.html">← Ana Sayfaya Dön</a></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Loading -->
   <div class="loading-overlay" id="loadingOverlay">
     <div class="loading-content">
       <div class="spinner"></div>
-      <h3 id="loadingText">Ödeme İşleniyor...</h3>
-      <p>Lütfen sayfayı kapatmayın</p>
+      <h3 id="loadingText">İşleniyor...</h3>
+      <p style="color:var(--muted); margin-top:8px">Lütfen bekleyin</p>
     </div>
   </div>
 
+  <div class="wrap">
+    <div class="header">
+      <div class="logo">SC</div>
+      <div>
+        <h1>Ödeme ve Plan Seçimi</h1>
+        <div class="muted">Denemeniz bittiyse aboneliğinizi başlatın; aktifsiniz ve devam etmek istiyorsanız sürenizi uzatın ya da kota ekleyin.</div>
+      </div>
+    </div>
+
+    <div id="passiveBanner" class="banner">Hesabınız <b>PASSIVE</b> durumda. Devam etmek için bir plan seçerek ödemeyi tamamlayın.</div>
+
+    <div class="grid">
+      <div class="card">
+        <h3 class="secTitle">Bilgileriniz</h3>
+        <label>Ad Soyad</label>
+        <input id="fullName" placeholder="Ad Soyad" autocomplete="name" />
+        <label>Şirket</label>
+        <input id="company" placeholder="Şirket" autocomplete="organization" />
+        <label>Telefon (WhatsApp)</label>
+        <input id="phone" placeholder="+90..." autocomplete="tel" />
+
+        <h3 class="secTitle">Fatura Dönemi</h3>
+        <div class="billToggle">
+          <span>Aylık</span>
+          <div id="billingSwitch" class="switch" data-mode="monthly" role="switch" aria-label="Faturalama Dönemi"></div>
+          <span>Yıllık <span class="badge">%50 İndirim</span></span>
+        </div>
+
+        <h3 class="secTitle">Plan Seç</h3>
+        <div id="plans" class="plans">
+          <div class="plan" data-plan="basic" data-monthly-price="9.95" data-yearly-price="4.95" data-monthly-quota="500" data-yearly-quota="6000">
+            <div class="planTitle">Basic</div>
+            <div class="price" data-price>$/ay</div>
+            <div class="quota" data-quota>Kota</div>
+          </div>
+          <div class="plan" data-plan="pro" data-monthly-price="24.95" data-yearly-price="12.95" data-monthly-quota="1500" data-yearly-quota="18000">
+            <div class="planTitle">Pro</div>
+            <div class="price" data-price>$/ay</div>
+            <div class="quota" data-quota>Kota</div>
+          </div>
+          <div class="plan" data-plan="max" data-monthly-price="49.95" data-yearly-price="29.95" data-monthly-quota="5000" data-yearly-quota="60000">
+            <div class="planTitle">Max</div>
+            <div class="price" data-price>$/ay</div>
+            <div class="quota" data-quota>Kota</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="secTitle">Sipariş Özeti</h3>
+        <div class="summaryRow"><div>Plan</div><div id="summaryPlan" class="muted">Seçiniz</div></div>
+        <div class="summaryRow"><div>Süre</div><div id="summaryDuration" class="muted">1 Ay</div></div>
+        <div class="summaryRow"><div>Kota</div><div id="summaryQuota" class="muted">-</div></div>
+        <div class="summaryRow"><div>Toplam</div><div id="summaryTotal" class="muted">$0.00</div></div>
+
+        <button id="payButton" class="cta" disabled>
+          <span id="payButtonText">Plan Seçin</span>
+        </button>
+
+        <div id="statusMsg" class="muted"></div>
+        
+        <div class="info-box">
+          <div><strong>💳 Global Ödeme:</strong> Stripe güvenli ödeme</div>
+          <div><strong>🌍 Para Birimi:</strong> USD gösterilir, kartınıza local currency yansır</div>
+          <div><strong>🛡️ Güvenlik:</strong> SSL şifreli, PCI DSS uyumlu</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot">Herhangi bir sorunda bize WhatsApp'tan ulaşın: +90 552 071 0977</div>
+  </div>
+
   <script>
-    // === CONFIG ===
-    const API = "https://api.satinalmacopilot.com";
-
-    // JWT guard – yoksa login
-    (function guard(){
-      const tok = localStorage.getItem('sc.jwt');
-      if(!tok){ window.location.href = '/login.html'; }
-    })();
-
-    // Fiyat & kota — Admin’deki değerlerle hizalı
-    const PRICING = {
-      monthly: {
-        basic: { price: 19.00,  quota:  500,  name: 'Basic' },
-        pro:   { price: 49.00,  quota: 1500,  name: 'Pro'   },
-        max:   { price: 99.00,  quota: 5000,  name: 'Max'   }
-      },
-      yearly: {
-        basic: { price: 129.00, quota:  12000,  name: 'Basic' },
-        pro:   { price: 449.00, quota:  60000,  name: 'Pro'   },
-        max:   { price: 999.00, quota: 180000,  name: 'Max'   }
-      }
+    // ====== CONFIGURATION ======
+    const IS_PRODUCTION = window.location.hostname !== 'localhost' && !window.location.hostname.includes('127.0.0.1');
+    
+    const STRIPE_CONFIG = {
+      test: 'pk_test_51Qkq8iCxIA7H9vX1tcASu7lttD28y8uQN2DVIAholUom1MNwEWaEAXFW9lrvyjYjQSR9yLtfsQB3AxrgvN1fnkt00uwkCxEG5',
+      live: 'pk_live_51Qkq8iCxIA7H9vX1DvKkU62vcpIsgJzUk2rIDAGaxUMhuWZUrJ5nHoox1WjImEhTM8fvheyOJ4wSD0YXnS8VAkEh00noftlqEM'
+    };
+    
+    const API_CONFIG = {
+      local: 'http://localhost:3001',
+      production: 'https://satinalmacopilot.com:3001'
     };
 
-    const FEATURES = {
-      basic: ['✅ Tedarikçi Bulma','✅ Basit RFQ','✅ Temel Risk Analizi','❌ API Erişimi'],
-      pro:   ['✅ Tüm Basic','✅ Gelişmiş RFQ','✅ Detaylı Risk Analizi','✅ API Erişimi'],
-      max:   ['✅ Tüm Pro','✅ Öncelikli Destek','✅ ERP Entegrasyonu','✅ Özel Raporlama']
-    };
+    const STRIPE_PUBLISHABLE_KEY = IS_PRODUCTION ? STRIPE_CONFIG.live : STRIPE_CONFIG.test;
+    const API_BASE_URL = IS_PRODUCTION ? API_CONFIG.production : API_CONFIG.local;
+    
+    const SUPABASE_URL = 'https://dblepmaqqkudsbmvlqcw.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRibGVwbWFxcWt1ZHNibXZscWN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0NTUzOTksImV4cCI6MjA3MjAzMTM5OX0.yOPbSl2o2LjHNryW0eIfKeJa5YJgBC94GWzswlclPWg';
 
-    // Global state
-    let selectedPlan = 'pro';
-    let selectedBilling = 'monthly';
+    let stripe = null;
+    let selectedPlan = null;
+    let selectedBilling = 'yearly';
     let currentUser = null;
 
-    document.addEventListener('DOMContentLoaded', init);
+    const $ = s => document.querySelector(s);
+    const $$ = s => Array.from(document.querySelectorAll(s));
 
-    async function init(){
-      bindUI();
-      hydratePrices();
-      await loadProfile();     // kullanıcı bilgisi
-      updatePlanDisplay();
-      updateSummary();
-      document.getElementById('payButton').disabled = false;
+    const params = new URLSearchParams(location.search);
+    const urlPref = {
+      phone: params.get('phone') || '',
+      plan: (params.get('plan') || '').toLowerCase(),
+      billing: (params.get('billing') || '').toLowerCase(),
+      return_user: params.get('return_user') === 'true',
+      reason: params.get('reason') || ''
+    };
+
+    function formatMoney(n){ return '$' + Number(n||0).toFixed(2) }
+    function normalizePhone(v){ return (v||'').replace(/[^\d+]/g,'') }
+
+    function showLoading(message = 'İşleniyor...') {
+      $('#loadingText').textContent = message;
+      $('#loadingOverlay').style.display = 'flex';
     }
 
-    function bindUI(){
-      // billing toggle
-      document.querySelectorAll('#billingToggle button').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          selectedBilling = btn.dataset.billing;
-          document.querySelectorAll('#billingToggle button').forEach(b=>b.classList.toggle('active', b===btn));
-          hydratePrices();
-          updatePlanDisplay();
-          updateSummary();
-        });
-      });
-
-      // plan kartları
-      document.querySelectorAll('.planOption').forEach(card=>{
-        card.addEventListener('click', ()=>{
-          selectedPlan = card.dataset.plan;
-          document.querySelectorAll('.planOption').forEach(c=>c.classList.toggle('active', c===card));
-          updatePlanDisplay();
-          updateSummary();
-        });
-      });
-
-      // pay
-      document.getElementById('payButton').addEventListener('click', processPayment);
+    function hideLoading() {
+      $('#loadingOverlay').style.display = 'none';
     }
 
-    function hydratePrices(){
-      ['basic','pro','max'].forEach(p=>{
-        const el = document.getElementById(`p-${p}`);
-        const plan = PRICING[selectedBilling][p];
-        el.textContent = `${plan.name} • ${plan.quota.toLocaleString()} mesaj • $${plan.price}`;
-      });
-    }
-
-    async function loadProfile(){
-      const tok = localStorage.getItem('sc.jwt');
-      try{
-        const r = await fetch(`${API}/api/user/profile`, { headers:{ Authorization: 'Bearer '+tok }});
-        const j = await r.json();
-        // profil için phone ve ad e-posta
-        const phone = j?.user?.phone || j?.phone || '-';
-        currentUser = {
-          name: j?.user?.name || j?.name || '-',
-          company_name: j?.user?.company || j?.company || '-',
-          contact_phone: phone,
-          subscription_plan: (j?.user?.subscription_plan || j?.subscription_plan || 'trial')
-        };
-        // lookup ile kota & durum
-        const r2 = await fetch(`${API}/api/customer/lookup`,{
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ phone })
-        });
-        const u = await r2.json();
-        if(u?.exists){
-          currentUser.subscription_plan = u.subscription_status === 'trial' ? 'trial' : (u.subscription_plan || 'trial');
-        }
-        // UI
-        document.getElementById('userName').textContent    = currentUser.name || '—';
-        document.getElementById('companyName').textContent = currentUser.company_name || '—';
-        document.getElementById('phoneNumber').textContent = currentUser.contact_phone || '—';
-        document.getElementById('currentPlan').textContent = (currentUser.subscription_plan || 'trial').toUpperCase();
-      }catch{
-        // profil okunamazsa yine ödeme akışını engellemeyelim
-      }
-    }
-
-    function updatePlanDisplay() {
-      const plan = PRICING[selectedBilling][selectedPlan];
-      document.getElementById('planName').textContent  = `${plan.name} Plan`;
-      document.getElementById('planPrice').textContent = `$${plan.price}/${selectedBilling==='monthly'?'ay':'yıl'}`;
-      document.getElementById('planFeatures').innerHTML =
-        FEATURES[selectedPlan].map(x=>`<li>${x}</li>`).join('');
-    }
-
-    function updateSummary() {
-      const plan = PRICING[selectedBilling][selectedPlan];
-      document.getElementById('summaryPlan').textContent     = plan.name;
-      document.getElementById('summaryDuration').textContent = selectedBilling==='monthly'?'1 Ay':'1 Yıl';
-      document.getElementById('summaryQuota').textContent    = plan.quota.toLocaleString() + ' mesaj';
-      document.getElementById('summaryUSD').textContent      = '$' + plan.price.toFixed(2);
-      document.getElementById('payButtonText').textContent   = `$${plan.price.toFixed(2)} Öde`;
-    }
-
-    // Ödeme akışı
-    async function processPayment(){
-      const tok = localStorage.getItem('sc.jwt');
-      if(!tok){ window.location.href='/login.html'; return; }
-
-      showLoading('Ödeme hazırlanıyor…');
-      try{
-        const res = await fetch(`${API}/api/payment/create-checkout-session`, {
-          method:'POST',
-          headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+tok },
-          body: JSON.stringify({ plan_code: selectedPlan, billing_cycle: selectedBilling })
-        });
-        const out = await res.json();
-
-        hideLoading();
-        if (out?.url) {
-          window.location.href = out.url;
-        } else if (out?.checkout_url){
-          window.location.href = out.checkout_url;
+    function paintPlanCards(){
+      const yearly = selectedBilling === 'yearly';
+      $$('#plans .plan').forEach(card=>{
+        const mp = Number(card.dataset.monthlyPrice);
+        const yp = Number(card.dataset.yearlyPrice);
+        const mq = Number(card.dataset.monthlyQuota);
+        const yq = Number(card.dataset.yearlyQuota);
+        
+        if (yearly) {
+          card.querySelector('[data-price]').textContent = `$${yp}/ay`;
+          const savings = ((mp * 12 - yp * 12) / (mp * 12) * 100).toFixed(0);
+          card.querySelector('[data-quota]').textContent = `${yq.toLocaleString('tr-TR')} mesaj (${savings}% tasarruf)`;
         } else {
-          throw new Error(out?.error || 'No checkout URL');
+          card.querySelector('[data-price]').textContent = `$${mp}/ay`;
+          card.querySelector('[data-quota]').textContent = `${mq.toLocaleString('tr-TR')} mesaj`;
         }
-      }catch(err){
-        hideLoading();
-        showError(`Ödeme işlemi başlatılamadı: ${err.message}`);
+      });
+    }
+
+    function updateSummary(){
+      const yearly = selectedBilling === 'yearly';
+      $('#summaryDuration').textContent = yearly ? '1 Yıl (aylık faturalama)' : '1 Ay';
+
+      if(!selectedPlan){
+        $('#summaryPlan').textContent = 'Seçiniz';
+        $('#summaryQuota').textContent = '-';
+        $('#summaryTotal').textContent = '$0.00';
+        $('#payButton').disabled = true;
+        $('#payButtonText').textContent = 'Plan Seçin';
+        return;
+      }
+      
+      const card = $(`.plan[data-plan="${selectedPlan}"]`);
+      const price = Number(card.dataset[yearly ? 'yearlyPrice':'monthlyPrice']);
+      const quota = Number(card.dataset[yearly ? 'yearlyQuota':'monthlyQuota']);
+      
+      $('#summaryPlan').textContent = card.querySelector('.planTitle').textContent.trim();
+      $('#summaryQuota').textContent = quota.toLocaleString('tr-TR') + ' mesaj';
+      
+      if (yearly) {
+        $('#summaryTotal').textContent = `${formatMoney(price)}/ay (yıllık ${formatMoney(price * 12)})`;
+      } else {
+        $('#summaryTotal').textContent = formatMoney(price);
+      }
+      
+      $('#payButton').disabled = false;
+      $('#payButtonText').textContent = yearly ? `${formatMoney(price * 12)} Öde (Yıllık)` : `${formatMoney(price)} Öde`;
+    }
+
+    function selectPlan(plan){
+      selectedPlan = plan;
+      $$('#plans .plan').forEach(c => c.dataset.selected = (c.dataset.plan === plan ? 'true':'false'));
+      updateSummary();
+    }
+
+    function setBilling(mode){
+      selectedBilling = mode;
+      $('#billingSwitch').dataset.mode = mode;
+      paintPlanCards();
+      updateSummary();
+    }
+
+    async function fetchUserByPhone(phone){
+      const clean = normalizePhone(phone);
+      if(!clean) return null;
+      try {
+        const url = `${SUPABASE_URL}/rest/v1/customers?contact_phone=eq.${encodeURIComponent(clean)}&select=*`;
+        const res = await fetch(url, { 
+          headers:{ 
+            apikey: SUPABASE_ANON_KEY, 
+            Authorization: `Bearer ${SUPABASE_ANON_KEY}` 
+          }
+        });
+        const data = await res.json();
+        return data && data[0] ? data[0] : null;
+      } catch (error) {
+        console.error('User fetch error:', error);
+        return null;
       }
     }
 
-    // UI helpers
-    function showLoading(msg){ document.getElementById('loadingText').textContent = msg; document.getElementById('loadingOverlay').style.display='flex'; }
-    function hideLoading(){ document.getElementById('loadingOverlay').style.display='none'; }
-    function showError(message){
-      const div = document.createElement('div');
-      div.className='error-message';
-      div.innerHTML = `<h3>⚠️ Hata</h3><p>${message}</p>`;
-      const firstCard = document.querySelector('.card');
-      firstCard.parentNode.insertBefore(div, firstCard.nextSibling);
+    function showPassiveBanner(visible){
+      const el = $('#passiveBanner');
+      if(visible) el.classList.add('show'); else el.classList.remove('show');
     }
+
+    async function bootstrap(){
+      console.log('🔧 Environment:', IS_PRODUCTION ? 'PRODUCTION' : 'TEST');
+      console.log('🔑 Stripe Key:', STRIPE_PUBLISHABLE_KEY.substring(0, 20) + '...');
+      console.log('🌐 API URL:', API_BASE_URL);
+
+      if (window.Stripe && STRIPE_PUBLISHABLE_KEY) {
+        try {
+          stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+          console.log('✅ Stripe initialized');
+        } catch (error) {
+          console.error('❌ Stripe initialization failed:', error);
+          alert('Stripe yüklenemedi. Sayfayı yenileyin.');
+          return;
+        }
+      } else {
+        console.error('❌ Stripe SDK not loaded');
+        alert('Ödeme sistemi yüklenemedi. Sayfayı yenileyin.');
+        return;
+      }
+
+      if(urlPref.billing === 'yearly' || urlPref.billing === 'monthly') {
+        setBilling(urlPref.billing);
+      } else {
+        setBilling('yearly');
+      }
+
+      paintPlanCards();
+
+      if(urlPref.plan && ['basic','pro','max'].includes(urlPref.plan)) {
+        selectPlan(urlPref.plan);
+      } else {
+        selectPlan('pro');
+      }
+
+      if(urlPref.phone){
+        $('#phone').value = urlPref.phone;
+        currentUser = await fetchUserByPhone(urlPref.phone);
+      }
+
+      if(currentUser){
+        if(currentUser.name) $('#fullName').value = currentUser.name;
+        if(currentUser.company_name) $('#company').value = currentUser.company_name;
+
+        const now = new Date();
+        const trialEnd = currentUser.trial_end_date ? new Date(currentUser.trial_end_date) : null;
+        const planEnd = currentUser.plan_end_date ? new Date(currentUser.plan_end_date) : null;
+        let status = (currentUser.subscription_status||'').toLowerCase();
+        
+        if(status === 'trial' && trialEnd && trialEnd < now) status = 'passive';
+        if(status === 'active' && planEnd && planEnd < now) status = 'passive';
+        if(currentUser.used_quota >= (currentUser.monthly_quota||0)) status = 'passive';
+
+        showPassiveBanner(status === 'passive');
+        
+        if (urlPref.return_user) {
+          let message = '';
+          switch(urlPref.reason) {
+            case 'trial_expired':
+              message = 'Trial süreniz sona erdi. Devam etmek için bir plan seçin.';
+              break;
+            case 'quota_exceeded':
+              message = 'Mesaj kotanız doldu. Plan yükseltin veya yenileyin.';
+              break;
+            default:
+              message = 'Hesabınızı yeniden aktifleştirmek için bir plan seçin.';
+          }
+          $('#statusMsg').textContent = message;
+          $('#statusMsg').style.color = '#f6a609';
+        }
+      }
+
+      updateSummary();
+    }
+
+    $$('#plans .plan').forEach(card=>{
+      card.addEventListener('click', ()=> selectPlan(card.dataset.plan));
+    });
+
+    $('#billingSwitch').addEventListener('click', ()=>{
+      setBilling(selectedBilling === 'monthly' ? 'yearly' : 'monthly');
+    });
+
+    async function createStripeCheckout(payload){
+      try {
+        console.log('📤 API Request:', {
+          url: `${API_BASE_URL}/api/payment/create-checkout-session`,
+          payload: payload
+        });
+
+        const response = await fetch(`${API_BASE_URL}/api/payment/create-checkout-session`, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('❌ API Error Response:', errorText);
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+
+        const session = await response.json();
+        console.log('✅ API Response:', session);
+        
+        return session;
+      } catch (error) {
+        console.error('🔥 API Error:', error);
+        throw error;
+      }
+    }
+
+    $('#payButton').addEventListener('click', async ()=>{
+      const name = $('#fullName').value.trim();
+      const company = $('#company').value.trim();
+      const phone = normalizePhone($('#phone').value);
+
+      if(!name || !company || !phone){ 
+        alert('Ad Soyad, Şirket ve Telefon gereklidir.'); 
+        return; 
+      }
+      if(!selectedPlan){ 
+        alert('Lütfen bir plan seçin.'); 
+        return; 
+      }
+
+      const yearly = selectedBilling === 'yearly';
+      const card = $(`.plan[data-plan="${selectedPlan}"]`);
+      const monthlyPrice = Number(card.dataset.monthlyPrice);
+      const yearlyPrice = Number(card.dataset.yearlyPrice);
+      const price = yearly ? yearlyPrice : monthlyPrice;
+      const quota = Number(card.dataset[yearly ? 'yearlyQuota':'monthlyQuota']);
+
+      $('#payButton').disabled = true;
+      $('#payButtonText').textContent = 'Hazırlanıyor...';
+      showLoading('Güvenli ödeme sayfası hazırlanıyor...');
+
+      const payload = {
+        customer: {
+          name, 
+          company, 
+          phone,
+          email: currentUser?.email || `${phone.replace(/[^\d]/g, '')}@temp.com`
+        },
+        plan: selectedPlan,
+        billing: selectedBilling,
+        price: yearly ? yearlyPrice * 12 : monthlyPrice,
+        monthlyPrice: yearly ? yearlyPrice : monthlyPrice,
+        quota,
+        context: currentUser?.subscription_status || 'new',
+        success_url: `${window.location.origin}/success.html?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${window.location.origin}/payment.html?phone=${encodeURIComponent(phone)}&plan=${selectedPlan}&billing=${selectedBilling}&canceled=true`
+      };
+
+      try {
+        const session = await createStripeCheckout(payload);
+        
+        const sessionId = session.session_id || session.sessionId;
+        const checkoutUrl = session.checkout_url || session.url;
+
+        console.log('🔑 Session ID:', sessionId);
+        console.log('🔗 Checkout URL:', checkoutUrl);
+
+        if (!sessionId) {
+          throw new Error('Checkout session ID alınamadı. Backend response: ' + JSON.stringify(session));
+        }
+
+        hideLoading();
+        $('#statusMsg').textContent = 'Stripe ödeme sayfasına yönlendiriliyorsunuz...';
+        $('#statusMsg').style.color = '#19c37d';
+        
+        if (stripe) {
+          console.log('🚀 Redirecting via Stripe.js...');
+          const { error } = await stripe.redirectToCheckout({ sessionId });
+          
+          if (error) {
+            throw new Error('Stripe redirect error: ' + error.message);
+          }
+        } else if (checkoutUrl) {
+          console.log('🚀 Redirecting via direct URL...');
+          window.location.href = checkoutUrl;
+        } else {
+          throw new Error('Ne Stripe instance ne de checkout URL mevcut');
+        }
+
+      } catch(err) {
+        console.error('💥 Payment error:', err);
+        hideLoading();
+        
+        $('#payButton').disabled = false;
+        $('#payButtonText').textContent = yearly ? `${formatMoney(yearlyPrice * 12)} Öde (Yıllık)` : `${formatMoney(monthlyPrice)} Öde`;
+        $('#statusMsg').textContent = 'Ödeme başlatılırken hata: ' + err.message;
+        $('#statusMsg').style.color = '#ff6b6b';
+        
+        alert(`❌ Ödeme işlemi başlatılamadı\n\n${err.message}\n\nDestek:\n📧 info@satinalmacopilot.com\n📱 WhatsApp: +90 552 071 0977`);
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', bootstrap);
   </script>
 </body>
 </html>
-
