@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>System Status - Satınalma CoPilot</title>
+  <meta http-equiv="refresh" content="30">
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+    .status { padding: 15px; margin: 10px 0; border-radius: 8px; }
+    .ok { background: #d1fae5; border-left: 4px solid #10b981; }
+    .error { background: #fee2e2; border-left: 4px solid #ef4444; }
+    .metric { display: flex; justify-content: space-between; padding: 8px 0; }
+    h1 { color: #1e293b; }
+  </style>
+</head>
+<body>
+  <h1>🏥 System Health Dashboard</h1>
+  <div id="status">Loading...</div>
+  <p style="color: #64748b; font-size: 0.9rem;">Auto-refresh every 30 seconds</p>
+  
+  <script>
+    async function checkHealth() {
+      const checks = [
+        { name: 'Backend Health', url: '/api/health' },
+        { name: 'Plans API (Monthly)', url: '/api/payment/plans?billing=monthly' },
+        { name: 'Plans API (Yearly)', url: '/api/payment/plans?billing=yearly' },
+        { name: 'Testimonials', url: '/api/testimonials' },
+        { name: 'Public Settings', url: '/api/public/settings' }
+      ];
+      
+      const results = await Promise.all(
+        checks.map(async (check) => {
+          try {
+            const start = Date.now();
+            const res = await fetch(check.url);
+            const time = Date.now() - start;
+            const json = await res.json();
+            const isOk = res.ok && (json.success !== false);
+            return { 
+              ...check, 
+              status: isOk ? 'ok' : 'error', 
+              time: `${time}ms`,
+              detail: !isOk ? json.error || 'Failed' : ''
+            };
+          } catch (e) {
+            return { ...check, status: 'error', time: 'TIMEOUT', detail: e.message };
+          }
+        })
+      );
+      
+      document.getElementById('status').innerHTML = 
+        '<p style="color: #64748b;">Last check: ' + new Date().toLocaleString() + '</p>' +
+        results.map(r => `
+          <div class="status ${r.status}">
+            <div class="metric">
+              <span><strong>${r.name}</strong></span>
+              <span>${r.status === 'ok' ? '✅' : '❌'} ${r.time}</span>
+            </div>
+            ${r.detail ? '<div style="color: #ef4444; font-size: 0.9rem;">' + r.detail + '</div>' : ''}
+          </div>
+        `).join('');
+    }
+    
+    checkHealth();
+    setInterval(checkHealth, 30000);
+  </script>
+</body>
+</html>

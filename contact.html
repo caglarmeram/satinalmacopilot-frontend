@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>İletişim | Satınalma CoPilot</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E🤖%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;line-height:1.7;color:#0f172a;background:#fff}
+    .container{max-width:900px;margin:0 auto;padding:0 20px}
+
+    .navbar{background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.08);position:fixed;top:0;left:0;right:0;z-index:1000;padding:14px 0}
+    .nav-content{display:flex;justify-content:space-between;align-items:center}
+    .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;z-index:1001}
+    .logo{font-size:2rem}
+    .brand-text{font-size:1.5rem;font-weight:800;color:#2563eb}
+
+    /* Desktop Navigation */
+    .nav-links{display:flex;gap:16px;align-items:center}
+    .nav-btn{padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:600;transition:all .2s;font-size:.95rem;border:none;cursor:pointer;display:inline-block}
+    .btn-outline{background:white;color:#2563eb;border:2px solid #2563eb}
+    .btn-outline:hover{background:#eff6ff}
+    .btn-primary{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:white;box-shadow:0 4px 12px rgba(37,99,235,.3)}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(37,99,235,.4)}
+
+    /* Hamburger Menu */
+    .hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;z-index:1001}
+    .hamburger span{width:25px;height:3px;background:#2563eb;border-radius:3px;transition:all .3s ease}
+    .hamburger.active span:nth-child(1){transform:rotate(45deg) translate(8px,8px)}
+    .hamburger.active span:nth-child(2){opacity:0}
+    .hamburger.active span:nth-child(3){transform:rotate(-45deg) translate(7px,-7px)}
+
+    /* Mobile Menu */
+    .mobile-menu{display:none;position:fixed;top:70px;left:0;right:0;background:white;box-shadow:0 10px 30px rgba(0,0,0,.1);padding:0;flex-direction:column;gap:12px;max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease;z-index:999}
+    .mobile-menu.active{max-height:300px;padding:20px}
+    .mobile-menu a{width:100%;text-align:center;padding:14px;font-size:1rem}
+
+    /* Responsive */
+    @media (max-width:768px){
+      .nav-links{display:none}
+      .hamburger{display:flex}
+      .mobile-menu{display:flex}
+      .brand-text{font-size:1.2rem}
+      .contact-grid{grid-template-columns:1fr}
+    }
+
+    main{margin-top:80px;padding:40px 0 60px}
+    h1{font-size:2.5rem;font-weight:800;color:#0f172a;margin-bottom:30px;line-height:1.2}
+
+    .contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin:30px 0}
+    .contact-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:24px}
+    .contact-card h2{font-size:1.3rem;font-weight:700;color:#0f172a;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+    .contact-card p{margin-bottom:10px;color:#334155}
+    .contact-card a{color:#2563eb;text-decoration:none;font-weight:600}
+    .contact-card a:hover{text-decoration:underline}
+
+    .info-box{background:linear-gradient(135deg,#f8fafc 0%,#e2e8f0 100%);padding:24px;border-radius:12px;margin:30px 0}
+    .info-box p{margin-bottom:8px;color:#475569}
+    .info-box strong{color:#0f172a}
+
+    .page-nav{margin:30px 0;padding:20px;background:#f8fafc;border-radius:12px;display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+    .page-nav a{color:#2563eb;text-decoration:none;font-weight:600;padding:8px 16px;border-radius:8px;transition:background .2s}
+    .page-nav a:hover{background:#e2e8f0}
+
+    .footer{background:#0f172a;color:#fff;padding:28px 0;text-align:center}
+    .footer-brand{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px}
+    .footer-brand .logo{font-size:2rem}
+    .footer-brand .brand-text{font-size:1.3rem;font-weight:800;color:#fff}
+    .footer-links{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;margin:16px 0}
+    .footer-links a{color:#94a3b8;text-decoration:none}
+    .footer-links a:hover{color:#e2e8f0}
+    .footer-info{color:#64748b;font-size:.9rem;margin-top:12px}
+
+    @media (max-width:768px){
+      h1{font-size:2rem}
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="container">
+      <div class="nav-content">
+        <a href="/" class="brand">
+          <div class="logo">🤖</div>
+          <div class="brand-text">Satınalma CoPilot</div>
+        </a>
+        
+        <!-- Desktop Navigation -->
+        <div class="nav-links">
+          <a href="/" class="nav-btn btn-outline">Ana Sayfa</a>
+          <a href="/login.html" class="nav-btn btn-primary">Giriş Yap</a>
+        </div>
+        
+        <!-- Hamburger -->
+        <button class="hamburger" onclick="toggleMenu()">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="/" class="nav-btn btn-outline">Ana Sayfa</a>
+      <a href="/login.html" class="nav-btn btn-primary">Giriş Yap</a>
+    </div>
+  </nav>
+
+  <main>
+    <div class="container">
+      <h1>İletişim</h1>
+
+      <div class="contact-grid">
+        <div class="contact-card">
+          <h2>📧 E-posta</h2>
+          <p><strong>Genel Sorular:</strong><br>
+          <a href="mailto:info@satinalmacopilot.com.tr">info@satinalmacopilot.com.tr</a></p>
+          <p><strong>KVKK/GDPR Başvuruları:</strong><br>
+          <a href="mailto:info@satinalmacopilot.com">info@satinalmacopilot.com</a></p>
+        </div>
+
+        <div class="contact-card">
+          <h2>📞 Telefon</h2>
+          <p><strong>Türkiye Destek Hattı:</strong><br>
+          <a href="tel:+905520710977">+90 552 071 09 77</a></p>
+          <p style="color:#64748b;font-size:.9rem">Pazartesi–Cumartesi<br>09:00–20:00 (TR saati)</p>
+        </div>
+
+        <div class="contact-card">
+          <h2>🇺🇸 ABD İletişim</h2>
+          <p><strong>WhatsApp:</strong><br>
+          <a href="https://wa.me/14109054109">+1 (410) 905-4109</a></p>
+          <p><strong>SMS:</strong><br>
+          <a href="sms:+13056993553">+1 (305) 699-3553</a></p>
+          <p><strong>Faks:</strong><br>+1 (276) 664-0997</p>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <p><strong>📍 Adres:</strong></p>
+        <p>Back To Stylish LLC<br>
+        806 NW 16th Ave Unit #216<br>
+        Gainesville, FL 32601<br>
+        United States</p>
+        <p style="margin-top:12px"><strong>EIN:</strong> 61-2244084</p>
+      </div>
+
+      <div class="page-nav">
+        <a href="/faq.html">SSS</a>
+        <a href="/about.html">Hakkımızda</a>
+        <a href="/">Ana Sayfa</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-brand">
+        <div class="logo">🤖</div>
+        <div class="brand-text">Satınalma CoPilot</div>
+      </div>
+      <div class="footer-links">
+        <a href="/about.html">Hakkımızda</a>
+        <a href="/#pricing">Fiyatlandırma</a>
+        <a href="/contact.html">İletişim</a>
+        <a href="/privacy.html">Gizlilik</a>
+        <a href="/terms.html">Kullanım Koşulları</a>
+        <a href="/faq.html">SSS</a>
+      </div>
+      <p class="footer-info">&copy; 2025 Back To Stylish LLC • EIN 61-2244084<br>806 NW 16th Ave Unit #216, Gainesville, FL 32601, USA</p>
+    </div>
+  </footer>
+
+<script>
+function toggleMenu(){const m=document.getElementById('mobileMenu'),h=document.querySelector('.hamburger');m.classList.toggle('active');h.classList.toggle('active')}
+document.addEventListener('click',function(e){const m=document.getElementById('mobileMenu'),h=document.querySelector('.hamburger');if(!e.target.closest('.navbar')){m.classList.remove('active');h.classList.remove('active')}});
+document.querySelectorAll('.mobile-menu a').forEach(l=>l.addEventListener('click',function(){const m=document.getElementById('mobileMenu'),h=document.querySelector('.hamburger');m.classList.remove('active');h.classList.remove('active')}));
+window.addEventListener('scroll',function(){const m=document.getElementById('mobileMenu'),h=document.querySelector('.hamburger');if(m.classList.contains('active')){m.classList.remove('active');h.classList.remove('active')}});
+</script>
+</body>
+</html>

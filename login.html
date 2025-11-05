@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Giriş Yap - Satınalma CoPilot</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E🤖%3C/text%3E%3C/svg%3E">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 440px;
+      width: 100%;
+      padding: 40px;
+    }
+
+    .logo-section {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .logo {
+      font-size: 4rem;
+      margin-bottom: 10px;
+    }
+
+    .brand-text {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #2563eb;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: #64748b;
+      font-size: 0.95rem;
+    }
+
+    .form-section {
+      margin-top: 30px;
+    }
+
+    .form-step {
+      display: none;
+    }
+
+    .form-step.active {
+      display: block;
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.2s;
+      background: #f9fafb;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #2563eb;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    input.error {
+      border-color: #ef4444;
+      background: #fef2f2;
+    }
+
+    .error-message {
+      color: #ef4444;
+      font-size: 0.85rem;
+      margin-top: 6px;
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 10px;
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: #f1f5f9;
+      color: #475569;
+      margin-top: 10px;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: #e2e8f0;
+      box-shadow: none;
+    }
+
+    .info-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 10px;
+      padding: 14px;
+      margin: 20px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .info-box-icon {
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .info-box-text {
+      color: #1e40af;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .back-link a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    .timer {
+      text-align: center;
+      color: #64748b;
+      font-size: 0.9rem;
+      margin-top: 15px;
+    }
+
+    .timer.warning {
+      color: #ef4444;
+      font-weight: 600;
+    }
+
+    .success-icon {
+      text-align: center;
+      font-size: 4rem;
+      margin-bottom: 20px;
+      animation: scaleIn 0.5s ease-out;
+    }
+
+    @keyframes scaleIn {
+      from { transform: scale(0); }
+      to { transform: scale(1); }
+    }
+
+    .loading {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #ffffff;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="logo-section">
+      <div class="logo">🤖</div>
+      <div class="brand-text">Satınalma CoPilot</div>
+      <div class="subtitle">WhatsApp ile güvenli giriş</div>
+    </div>
+
+    <div class="form-section">
+      <!-- STEP 1: Telefon Numarası -->
+      <div class="form-step active" id="step1">
+        <div class="form-group">
+          <label for="phone">WhatsApp Telefon Numaranız</label>
+          <input 
+            type="tel" 
+            id="phone" 
+            placeholder="+90 555 123 45 67"
+            autocomplete="tel"
+          >
+          <div class="error-message" id="phoneError">Geçerli bir telefon numarası girin</div>
+        </div>
+
+        <div class="info-box">
+          <div class="info-box-icon">📱</div>
+          <div class="info-box-text">
+            Size WhatsApp üzerinden 6 haneli bir doğrulama kodu göndereceğiz.
+          </div>
+        </div>
+
+        <button class="btn" id="sendCodeBtn" onclick="sendOTP()">
+          Kod Gönder
+        </button>
+
+        <div class="back-link">
+          <a href="/">← Ana Sayfaya Dön</a>
+        </div>
+      </div>
+
+      <!-- STEP 2: OTP Doğrulama -->
+      <div class="form-step" id="step2">
+        <div class="form-group">
+          <label for="otp">Doğrulama Kodu</label>
+          <input 
+            type="text" 
+            id="otp" 
+            placeholder="123456"
+            maxlength="6"
+            autocomplete="one-time-code"
+          >
+          <div class="error-message" id="otpError">Kod hatalı veya süresi dolmuş</div>
+        </div>
+
+        <div class="info-box">
+          <div class="info-box-icon">📲</div>
+          <div class="info-box-text">
+            <span id="phoneDisplay"></span> numarasına kod gönderdik.
+          </div>
+        </div>
+
+        <div class="timer" id="timer">Kalan süre: 10:00</div>
+
+        <button class="btn" id="verifyBtn" onclick="verifyOTP()">
+          Giriş Yap
+        </button>
+
+        <button class="btn btn-secondary" id="resendBtn" onclick="resendOTP()" disabled>
+          Yeni Kod Gönder
+        </button>
+
+        <div class="back-link">
+          <a href="#" onclick="backToPhone(); return false;">← Numarayı Değiştir</a>
+        </div>
+      </div>
+
+      <!-- STEP 3: Başarılı -->
+      <div class="form-step" id="step3">
+        <div class="success-icon">✅</div>
+        <h2 style="text-align: center; color: #10b981; margin-bottom: 10px;">Giriş Başarılı!</h2>
+        <p style="text-align: center; color: #64748b; margin-bottom: 20px;">
+          Dashboard'a yönlendiriliyorsunuz...
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'https://api.satinalmacopilot.com';
+    let phoneNumber = '';
+    let timerInterval = null;
+    let timeLeft = 600; // 10 dakika
+
+    // URL parametrelerini kontrol et
+    const urlParams = new URLSearchParams(window.location.search);
+    const redirectTo = urlParams.get('redirect') || 'dashboard';
+
+    // Telefon numarası temizleme
+    function normalizePhone(phone) {
+      let cleaned = phone.replace(/[^\d+]/g, '');
+      if (cleaned.startsWith('0')) cleaned = '+90' + cleaned.slice(1);
+      else if (cleaned.startsWith('90')) cleaned = '+' + cleaned;
+      else if (!cleaned.startsWith('+')) cleaned = '+90' + cleaned;
+      return cleaned;
+    }
+
+    // Telefon doğrulama
+    function validatePhone(phone) {
+      const cleaned = phone.replace(/[^\d+]/g, '');
+      return cleaned.length >= 10;
+    }
+
+    // OTP Gönder
+    async function sendOTP() {
+      const phoneInput = document.getElementById('phone');
+      const btn = document.getElementById('sendCodeBtn');
+      const errorMsg = document.getElementById('phoneError');
+
+      phoneNumber = normalizePhone(phoneInput.value.trim());
+
+      if (!validatePhone(phoneNumber)) {
+        phoneInput.classList.add('error');
+        errorMsg.classList.add('show');
+        return;
+      }
+
+      phoneInput.classList.remove('error');
+      errorMsg.classList.remove('show');
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loading"></span> Kod gönderiliyor...';
+
+      try {
+        const response = await fetch(`${API_BASE}/api/auth/request-otp`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: phoneNumber })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || 'Kod gönderilemedi');
+        }
+
+        // Step 2'ye geç
+        showStep('step2');
+        document.getElementById('phoneDisplay').textContent = phoneNumber;
+        startTimer();
+
+      } catch (error) {
+        alert('❌ Hata: ' + error.message);
+        btn.disabled = false;
+        btn.innerHTML = 'Kod Gönder';
+      }
+    }
+
+    // OTP Doğrula
+    async function verifyOTP() {
+      const otpInput = document.getElementById('otp');
+      const btn = document.getElementById('verifyBtn');
+      const errorMsg = document.getElementById('otpError');
+
+      const code = otpInput.value.trim();
+
+      if (code.length !== 6) {
+        otpInput.classList.add('error');
+        errorMsg.textContent = '6 haneli kodu girin';
+        errorMsg.classList.add('show');
+        return;
+      }
+
+      otpInput.classList.remove('error');
+      errorMsg.classList.remove('show');
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loading"></span> Doğrulanıyor...';
+
+      try {
+        const response = await fetch(`${API_BASE}/api/auth/verify-otp`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: phoneNumber, code })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || 'Doğrulama başarısız');
+        }
+
+        // JWT'yi kaydet
+        localStorage.setItem('copilot_token', data.token);
+        localStorage.setItem('copilot_user', JSON.stringify(data.user));
+
+        // Başarı ekranı
+        showStep('step3');
+        stopTimer();
+
+        // Yönlendirme
+        setTimeout(() => {
+          if (redirectTo === 'payment') {
+            // Plan seçimi varsa payment'a git
+            const selectedPlan = localStorage.getItem('selected_plan') || 'pro';
+            const selectedBilling = localStorage.getItem('selected_billing') || 'monthly';
+            window.location.href = `/payment.html?plan=${selectedPlan}&billing=${selectedBilling}`;
+          } else {
+            window.location.href = '/dashboard.html';
+          }
+        }, 2000);
+
+      } catch (error) {
+        otpInput.classList.add('error');
+        errorMsg.textContent = error.message;
+        errorMsg.classList.add('show');
+        btn.disabled = false;
+        btn.innerHTML = 'Giriş Yap';
+      }
+    }
+
+    // Yeni kod gönder
+    async function resendOTP() {
+      stopTimer();
+      const btn = document.getElementById('resendBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loading"></span> Gönderiliyor...';
+
+      try {
+        const response = await fetch(`${API_BASE}/api/auth/request-otp`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: phoneNumber })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || 'Kod gönderilemedi');
+        }
+
+        alert('✅ Yeni kod gönderildi!');
+        document.getElementById('otp').value = '';
+        timeLeft = 600;
+        startTimer();
+
+      } catch (error) {
+        alert('❌ Hata: ' + error.message);
+        btn.disabled = false;
+        btn.innerHTML = 'Yeni Kod Gönder';
+      }
+    }
+
+    // Timer
+    function startTimer() {
+      const timerEl = document.getElementById('timer');
+      const resendBtn = document.getElementById('resendBtn');
+
+      timerInterval = setInterval(() => {
+        timeLeft--;
+
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerEl.textContent = `Kalan süre: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+        if (timeLeft <= 60) {
+          timerEl.classList.add('warning');
+        }
+
+        if (timeLeft <= 0) {
+          stopTimer();
+          timerEl.textContent = 'Kod süresi doldu';
+          resendBtn.disabled = false;
+          resendBtn.innerHTML = 'Yeni Kod Gönder';
+        }
+      }, 1000);
+    }
+
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    // Step değiştir
+    function showStep(stepId) {
+      document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+      document.getElementById(stepId).classList.add('active');
+    }
+
+    function backToPhone() {
+      showStep('step1');
+      stopTimer();
+      document.getElementById('otp').value = '';
+      timeLeft = 180;
+    }
+
+    // Enter tuşu desteği
+    document.getElementById('phone').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendOTP();
+    });
+
+    document.getElementById('otp').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') verifyOTP();
+    });
+
+    // OTP otomatik odak
+    document.getElementById('otp').addEventListener('input', (e) => {
+      if (e.target.value.length === 6) {
+        verifyOTP();
+      }
+    });
+  </script>
+</body>
+</html>

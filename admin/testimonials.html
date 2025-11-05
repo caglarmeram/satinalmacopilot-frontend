@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <title>Admin – Testimonials</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root{--bg:#0b1220;--panel:#111a2b;--muted:#94a3b8;--text:#e5e7eb;--blue:#2563eb;--green:#10b981;--red:#ef4444;--border:#1f2a44}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    .wrap{max-width:1100px;margin:24px auto;padding:0 16px}
+    header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+    .badge{background:#0f172a;border:1px solid var(--border);color:var(--muted);padding:4px 8px;border-radius:8px;font-size:.85rem}
+    .row{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0}
+    .panel{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    input, textarea, select{background:#0f172a;border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:10px;outline:none}
+    textarea{min-height:90px;resize:vertical}
+    button{border:0;border-radius:10px;padding:10px 14px;font-weight:600;cursor:pointer}
+    .btn{background:#1f2937;color:#e5e7eb;border:1px solid var(--border)}
+    .btn:hover{filter:brightness(1.1)}
+    .btn-primary{background:var(--blue);color:#fff}
+    .btn-success{background:var(--green);color:#04120a}
+    .btn-danger{background:#7f1d1d;color:#fee2e2}
+    .btn-outline{background:transparent;border:1px dashed var(--border);color:var(--muted)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;margin-top:12px}
+    .card{background:#0f172a;border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px}
+    .muted{color:var(--muted)}
+    .row-between{display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .pill{font-size:.8rem;padding:4px 8px;border-radius:999px;border:1px solid var(--border);color:var(--muted)}
+    .drag{cursor:grab;user-select:none}
+    .hidden{display:none}
+    .status{margin-left:auto}
+    .inline{display:inline-flex;gap:8px;align-items:center}
+    .hr{height:1px;background:var(--border);margin:8px 0}
+    .footer{margin-top:18px;color:#93a5c4;font-size:.85rem}
+    .code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;background:#0b1327;border:1px solid var(--border);padding:2px 6px;border-radius:6px}
+    .kbd{border:1px solid var(--border);border-bottom-width:3px;padding:2px 6px;border-radius:6px;background:#0e1631}
+    .w100{width:100%}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h2 style="margin:0">Testimonials</h2>
+      <span class="badge">Admin</span>
+      <span id="status" class="badge">Hazır</span>
+      <a class="badge" href="/admin/" style="text-decoration:none">⟵ Panele dön</a>
+    </header>
+
+    <!-- Bağlantı ve kimlik bilgileriniz -->
+    <div class="panel">
+      <div class="toolbar">
+        <label class="inline">API Base
+          <input id="apiBase" value="https://api.satinalmacopilot.com" style="min-width:320px" />
+        </label>
+        <label class="inline">Admin Token
+          <input id="adminToken" placeholder="••••••" style="min-width:320px" />
+        </label>
+        <button id="btnLoad" class="btn">Yükle</button>
+        <button id="btnAdd" class="btn-primary">Yeni Ekle</button>
+        <div class="status inline">
+          <span class="kbd">drag</span> ile sırayı değiştir, <span class="code">Kaydet</span> ile yaz.
+        </div>
+      </div>
+    </div>
+
+    <!-- Liste -->
+    <div id="list" class="grid"></div>
+
+    <!-- Düzenleme formu -->
+    <div id="editor" class="panel hidden" style="margin-top:12px">
+      <div class="row">
+        <div class="w100">
+          <label>Ad Soyad</label>
+          <input id="f_name" class="w100" />
+        </div>
+        <div class="w100">
+          <label>Unvan / Şirket</label>
+          <input id="f_title" class="w100" />
+        </div>
+      </div>
+      <label>Metin</label>
+      <textarea id="f_content" class="w100"></textarea>
+      <div class="row" style="align-items:center">
+        <label class="inline">Puan
+          <select id="f_rating">
+            <option>5</option><option>4</option><option>3</option><option>2</option><option>1</option>
+          </select>
+        </label>
+        <label class="inline">Aktif?
+          <select id="f_active">
+            <option value="true" selected>Evet</option>
+            <option value="false">Hayır</option>
+          </select>
+        </label>
+        <label class="inline">Sıra
+          <input id="f_order" type="number" style="width:100px" />
+        </label>
+        <span class="status" id="editStatus"></span>
+      </div>
+      <div class="hr"></div>
+      <div class="row">
+        <button id="btnSave" class="btn-success">Kaydet</button>
+        <button id="btnCancel" class="btn-outline">Vazgeç</button>
+        <button id="btnDelete" class="btn-danger" title="Sil">Sil</button>
+      </div>
+    </div>
+
+    <div class="footer">
+      Not: Listeye girildikten sonra kartları sürükleyip bırakabilirsiniz. <strong>Kaydet</strong> dediğinizde sadece sıralar güncellenir.
+    </div>
+  </div>
+
+  <script src="./testimonials.js"></script>
+</body>
+</html>
+

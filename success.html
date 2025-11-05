@@ -1,576 +1,217 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kayıt Başarılı - Satınalma CoPilot</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #10b981, #059669);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .success-container {
-            background: white;
-            border-radius: 20px;
-            padding: 60px 40px;
-            max-width: 700px;
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            animation: slideUp 0.8s ease-out;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .success-icon {
-            font-size: 4rem;
-            margin-bottom: 24px;
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-10px); }
-            60% { transform: translateY(-5px); }
-        }
-
-        .success-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 16px;
-        }
-
-        .success-subtitle {
-            font-size: 1.2rem;
-            color: #64748b;
-            margin-bottom: 40px;
-            line-height: 1.6;
-        }
-
-        .user-info-card {
-            background: #f8fafc;
-            border-radius: 16px;
-            padding: 30px;
-            margin: 30px 0;
-            text-align: left;
-            border-left: 4px solid #10b981;
-        }
-
-        .user-info-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .info-item:last-child {
-            border-bottom: none;
-        }
-
-        .info-label {
-            color: #64748b;
-            font-weight: 500;
-        }
-
-        .info-value {
-            color: #1e293b;
-            font-weight: 600;
-        }
-
-        .status-badge {
-            background: #dcfce7;
-            color: #166534;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .quota-display {
-            background: #f0fdf4;
-            border: 2px solid #10b981;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 30px 0;
-        }
-
-        .quota-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #059669;
-            margin-bottom: 8px;
-        }
-
-        .quota-number {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: #10b981;
-            margin-bottom: 4px;
-        }
-
-        .quota-label {
-            color: #059669;
-            font-weight: 500;
-        }
-
-        .steps-container {
-            background: #f8fafc;
-            border-radius: 16px;
-            padding: 30px;
-            margin: 40px 0;
-            text-align: left;
-        }
-
-        .steps-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .step {
-            display: flex;
-            align-items: flex-start;
-            gap: 16px;
-            margin-bottom: 20px;
-            padding: 16px;
-            background: white;
-            border-radius: 12px;
-            border-left: 4px solid #10b981;
-        }
-
-        .step:last-child {
-            margin-bottom: 0;
-        }
-
-        .step-number {
-            background: #10b981;
-            color: white;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            flex-shrink: 0;
-        }
-
-        .step-content h4 {
-            color: #1e293b;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .step-content p {
-            color: #64748b;
-            font-size: 0.95rem;
-            line-height: 1.5;
-        }
-
-        .whatsapp-info {
-            background: #dcfce7;
-            border: 2px solid #10b981;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 30px 0;
-        }
-
-        .whatsapp-number {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #059669;
-            margin: 8px 0;
-        }
-
-        .whatsapp-button {
-            background: #25d366;
-            color: white;
-            text-decoration: none;
-            padding: 16px 32px;
-            border-radius: 12px;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin: 20px 0;
-            transition: all 0.3s ease;
-        }
-
-        .whatsapp-button:hover {
-            background: #20c757;
-            transform: translateY(-2px);
-        }
-
-        .trial-info {
-            background: #fef3c7;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 30px 0;
-        }
-
-        .trial-countdown {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #92400e;
-        }
-
-        .footer-links {
-            margin-top: 40px;
-            padding-top: 30px;
-            border-top: 1px solid #e2e8f0;
-        }
-
-        .footer-links a {
-            color: #2563eb;
-            text-decoration: none;
-            margin: 0 16px;
-            font-weight: 500;
-        }
-
-        .footer-links a:hover {
-            text-decoration: underline;
-        }
-
-        .example-messages {
-            background: #f1f5f9;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 30px 0;
-            text-align: left;
-        }
-
-        .example-title {
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 12px;
-            text-align: center;
-        }
-
-        .example-message {
-            background: white;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 8px 0;
-            font-style: italic;
-            color: #475569;
-            border-left: 3px solid #10b981;
-        }
-
-        @media (max-width: 768px) {
-            .success-container {
-                padding: 40px 24px;
-                margin: 10px;
-            }
-            
-            .success-title {
-                font-size: 2rem;
-            }
-            
-            .user-info-card {
-                padding: 20px;
-            }
-            
-            .info-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 4px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ödeme Başarılı - Satınalma CoPilot</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#10b981,#059669);min-height:100vh;padding:20px}
+    .container{min-height:100vh;display:flex;align-items:center;justify-content:center}
+    .card{background:#fff;border-radius:20px;padding:60px 40px;max-width:820px;width:100%;text-align:center;box-shadow:0 20px 40px rgba(0,0,0,.1)}
+    .icon{font-size:4rem;margin-bottom:24px;animation:bounce 2s infinite}
+    @keyframes bounce{0%,20%,50%,80%,100%{transform:translateY(0)}40%{transform:translateY(-10px)}60%{transform:translateY(-5px)}}
+    .title{font-size:2.4rem;font-weight:700;color:#1e293b;margin-bottom:12px}
+    .subtitle{font-size:1.05rem;color:#64748b;margin-bottom:28px;line-height:1.6}
+    .summary{background:linear-gradient(135deg,#f8fafc,#e2e8f0);border-radius:16px;padding:24px;margin:26px 0;text-align:left;border-left:4px solid #2563eb}
+    .summary h3{color:#1e293b;font-weight:600;margin-bottom:14px;text-align:center}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 20px}
+    .row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e2e8f0}
+    .row:last-child{border-bottom:none}
+    .label{color:#64748b;font-weight:500}
+    .value{color:#1e293b;font-weight:600}
+    .steps{background:#f8fafc;border-radius:16px;padding:26px;margin:30px 0;text-align:left}
+    .step{display:flex;gap:16px;margin-bottom:14px;padding:14px;background:#fff;border-radius:12px;border-left:4px solid #10b981}
+    .step-num{background:#10b981;color:#fff;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+    .wa-box{background:#dcfce7;border:2px solid #10b981;border-radius:12px;padding:20px;margin:24px 0}
+    .wa-num{font-size:1.4rem;font-weight:800;color:#059669;margin:6px 0}
+    .wa-btn{background:#25d366;color:#fff;text-decoration:none;padding:14px 28px;border-radius:12px;font-weight:700;display:inline-flex;align-items:center;gap:8px;margin:16px 0;transition:.3s}
+    .wa-btn:hover{background:#20c757;transform:translateY(-2px)}
+    .loading{text-align:center;padding:60px 20px}
+    .spinner{width:50px;height:50px;border:4px solid #f3f4f6;border-top:4px solid #10b981;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 20px}
+    @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+    .error{background:#fecaca;color:#991b1b;padding:20px;border-radius:12px;margin:20px 0}
+    @media (max-width:768px){
+      .card{padding:40px 24px}
+      .title{font-size:2rem}
+      .grid{grid-template-columns:1fr}
+    }
+  </style>
 </head>
 <body>
-    <div class="success-container">
-        <div class="success-icon">🎉</div>
-        <h1 class="success-title" id="mainTitle">Kayıt Başarılı!</h1>
-        <p class="success-subtitle" id="mainSubtitle">
-            Hoş geldiniz! WhatsApp asistanınızla tanışma zamanı.
-        </p>
-        
-        <div class="user-info-card" id="userInfoCard">
-            <h3 class="user-info-title">Hesap Bilgileriniz</h3>
-            <div class="info-item">
-                <span class="info-label">Ad Soyad:</span>
-                <span class="info-value" id="userName">Yükleniyor...</span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">Şirket:</span>
-                <span class="info-value" id="companyName">Yükleniyor...</span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">WhatsApp:</span>
-                <span class="info-value" id="phoneNumber">Yükleniyor...</span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">Plan:</span>
-                <span class="info-value" id="planName">Yükleniyor...</span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">Durum:</span>
-                <span class="status-badge" id="statusBadge">Aktif</span>
-            </div>
+  <div class="container">
+    <div class="card">
+      <!-- Loading -->
+      <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <h3>Bilgileriniz yükleniyor...</h3>
+      </div>
+
+      <!-- Success -->
+      <div id="success" style="display:none">
+        <div class="icon">🎉</div>
+        <h1 class="title">Ödeme Başarılı!</h1>
+        <p class="subtitle" id="welcomeMsg">Planınız aktifleştirildi!</p>
+
+        <div class="summary">
+          <h3>📋 Plan Detayları</h3>
+          <div class="grid">
+            <div class="row"><span class="label">Ad Soyad:</span><span class="value" id="name">-</span></div>
+            <div class="row"><span class="label">WhatsApp:</span><span class="value" id="phone">-</span></div>
+            <div class="row"><span class="label">Şirket:</span><span class="value" id="company">-</span></div>
+            <div class="row"><span class="label">Plan:</span><span class="value" id="plan">-</span></div>
+
+            <div class="row"><span class="label">Satın Alınan Kota:</span><span class="value" id="purchasedQuota">-</span></div>
+            <div class="row"><span class="label">Ödenen:</span><span class="value" id="amount">-</span></div>
+
+            <div class="row"><span class="label">Mevcut Kota (Toplam):</span><span class="value" id="currentQuota">-</span></div>
+            <div class="row"><span class="label">Kullanım:</span><span class="value" id="usedQuota">-</span></div>
+            <div class="row"><span class="label">Kalan:</span><span class="value" id="remainingQuota">-</span></div>
+
+            <div class="row"><span class="label">Plan Başlangıç:</span><span class="value" id="planStart">-</span></div>
+            <div class="row"><span class="label">Plan Bitiş:</span><span class="value" id="planEnd">-</span></div>
+            <div class="row"><span class="label">Trial Bitiş:</span><span class="value" id="trialEnd">-</span></div>
+          </div>
         </div>
 
-        <div class="quota-display" id="quotaDisplay">
-            <div class="quota-title">Mesaj Hakkınız</div>
-            <div class="quota-number" id="quotaNumber">1000</div>
-            <div class="quota-label" id="quotaLabel">mesaj hakkı</div>
-        </div>
-        
-        <div class="whatsapp-info">
-            <p><strong>WhatsApp Asistan Numarası:</strong></p>
-            <div class="whatsapp-number">+1 (415) 523-8886</div>
-            <p>Bu numarayı WhatsApp'ta kaydedin ve ilk mesajınızı atın!</p>
-            <a href="https://wa.me/14155238886?text=Merhaba" class="whatsapp-button" target="_blank">
-                📱 WhatsApp'ta Mesaj Gönder
-            </a>
-        </div>
-        
-        <div class="steps-container">
-            <h3 class="steps-title">🚀 Başlamak için 3 basit adım:</h3>
-            
-            <div class="step">
-                <div class="step-number">1</div>
-                <div class="step-content">
-                    <h4>WhatsApp'ta Numarayı Kaydedin</h4>
-                    <p>+1 (415) 523-8886 numarasını "Satınalma CoPilot" adıyla WhatsApp'ta kaydedin</p>
-                </div>
-            </div>
-            
-            <div class="step">
-                <div class="step-number">2</div>
-                <div class="step-content">
-                    <h4>İlk Mesajınızı Atın</h4>
-                    <p>"Merhaba" yazarak asistanınızı aktifleştirin</p>
-                </div>
-            </div>
-            
-            <div class="step">
-                <div class="step-number">3</div>
-                <div class="step-content">
-                    <h4>Satınalma İhtiyaçlarınızı Paylaşın</h4>
-                    <p>"500 kg demir profil lazım" gibi ihtiyaçlarınızı doğal dille yazın</p>
-                </div>
-            </div>
+        <div class="wa-box">
+          <p><strong>WhatsApp Asistan:</strong></p>
+          <div class="wa-num">+1 (220) 345-0200</div>
+          <a class="wa-btn" id="waBtn" target="_blank" href="https://wa.me/12203450200?text=Merhaba">
+            📱 WhatsApp'ta Mesaj Gönder
+          </a>
         </div>
 
-        <div class="example-messages">
-            <h4 class="example-title">💡 İlk Deneme Önerileri:</h4>
-            <div class="example-message">"Hangi firmalar alüminyum profil üretiyor?"</div>
-            <div class="example-message">"Bosch Türkiye hakkında risk analizi"</div>
-            <div class="example-message">"Plastik ambalaj pazarı nasıl?"</div>
-            <div class="example-message">"RFQ başlat: 1000 adet vida"</div>
+        <div class="steps">
+          <h3 style="text-align:center;margin-bottom:16px">🚀 Başlamak için 3 adım</h3>
+          <div class="step"><div class="step-num">1</div><div><strong>Numarayı Kaydet</strong><br/>+1 (220) 345-0200 → "Satınalma CoPilot"</div></div>
+          <div class="step"><div class="step-num">2</div><div><strong>İlk Mesaj</strong><br/>"Merhaba" yazarak aktifleştir</div></div>
+          <div class="step"><div class="step-num">3</div><div><strong>İhtiyaç Yaz</strong><br/>"500 kg demir profil lazım"</div></div>
         </div>
-        
-        <div class="trial-info" id="trialInfo">
-            <p><strong>🎁 Ücretsiz Deneme Süreniz:</strong></p>
-            <div class="trial-countdown" id="trialCountdown">14 gün kaldı</div>
-            <p style="margin-top: 8px; font-size: 0.9rem; color: #92400e;" id="trialDetails">
-                Günlük mesaj hakkınız var. Sınırsız kullanım için planınızı yükseltin.
-            </p>
+
+        <div style="margin-top:30px;color:#64748b;font-size:.9rem">
+          <p>Soru? <a href="mailto:info@satinalmacopilot.com" style="color:#2563eb">Destek ekibimize ulaşın</a></p>
         </div>
-        
-        <div class="footer-links">
-            <a href="mailto:info@satinalmacopilot.com">📧 Destek</a>
-            <a href="tel:+905520710977">📞 Yardım</a>
-            <a href="index.html">🏠 Ana Sayfa</a>
-        </div>
+      </div>
+
+      <!-- Error -->
+      <div id="error" style="display:none">
+        <div class="icon">⚠️</div>
+        <h1 class="title">Bilgi Alınamadı</h1>
+        <div class="error" id="errorMsg">Bir sorun oluştu.</div>
+        <a href="/payment.html" style="color:#2563eb;font-weight:600">← Ödeme Sayfası</a>
+      </div>
     </div>
-    
-    <script>
-        // Supabase configuration
-        const SUPABASE_URL = 'https://dblepmaqqkudsbmvlqcw.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRibGVwbWFxcWt1ZHNibXZscWN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0NTUzOTksImV4cCI6MjA3MjAzMTM5OX0.yOPbSl2o2LjHNryW0eIfKeJa5YJgBC94GWzswlclPWg';
+  </div>
 
-        // Get URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const userPhone = urlParams.get('phone');
-        const selectedPlan = urlParams.get('plan');
-        const paymentStatus = urlParams.get('payment');
+  <script>
+    const API='https://api.satinalmacopilot.com';
+    const planNames={basic:'Basic',pro:'Pro',max:'Max'};
 
-        // Load user data and customize page
-        document.addEventListener('DOMContentLoaded', async function() {
-            if (userPhone) {
-                try {
-                    await loadUserData(userPhone);
-                } catch (error) {
-                    console.error('Error loading user data:', error);
-                    // Show default success message if user data fails to load
-                    showDefaultSuccess();
-                }
-            } else {
-                showDefaultSuccess();
-            }
+    const fmtNumber = n => (n ?? 0).toLocaleString('tr-TR');
+    const fmtDate = s => {
+      if(!s) return '-';
+      const d = new Date(s);
+      if (isNaN(d.getTime())) return '-';
+      return d.toLocaleString('tr-TR', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
+    };
 
-            // Update countdown and setup auto-redirect
-            updateTrialCountdown();
-            setupAutoRedirect();
-        });
+    async function load(){
+      try{
+        const params=new URLSearchParams(location.search);
+        const sessionId=params.get('session_id');
+        if(!sessionId) throw new Error('Session ID bulunamadı');
 
-        async function loadUserData(phone) {
-            try {
-                const cleanPhone = phone.replace(/[^\d+]/g, '');
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/customers?contact_phone=eq.${encodeURIComponent(cleanPhone)}&select=*`, {
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                    }
-                });
-                
-                const users = await response.json();
-                
-                if (users.length > 0) {
-                    const user = users[0];
-                    displayUserInfo(user);
-                    updatePageContent(user, paymentStatus);
-                } else {
-                    showDefaultSuccess();
-                }
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-                showDefaultSuccess();
-            }
+        // 1) Ödeme oturumu bilgisi
+        const r=await fetch(`${API}/api/payment/session-info?session_id=${encodeURIComponent(sessionId)}`);
+        if(!r.ok) throw new Error('Session bilgisi alınamadı');
+        const d=await r.json();
+        if(!d.success) throw new Error(d.error||'Hata');
+
+        // 2) Hesap detayları (kota & tarihler)
+        const phone = d.customer_phone;
+        let profile = null;
+        if (phone){
+          const pr = await fetch(`${API}/api/customer/lookup`,{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ phone })
+          });
+          if(pr.ok){ profile = await pr.json(); }
         }
 
-        function displayUserInfo(user) {
-            document.getElementById('userName').textContent = user.name || 'Belirtilmemiş';
-            document.getElementById('companyName').textContent = user.company_name || 'Belirtilmemiş';
-            document.getElementById('phoneNumber').textContent = user.contact_phone || 'Belirtilmemiş';
-            document.getElementById('planName').textContent = (user.subscription_plan || 'trial').toUpperCase();
-            
-            // Update quota display
-            const quota = user.monthly_quota || 1000;
-            document.getElementById('quotaNumber').textContent = quota.toLocaleString();
-            
-            if (user.subscription_status === 'trial') {
-                document.getElementById('quotaLabel').textContent = 'mesaj (14 gün deneme)';
-            } else {
-                const billing = user.billing_cycle || 'monthly';
-                document.getElementById('quotaLabel').textContent = `mesaj (${billing === 'monthly' ? '1 ay' : '1 yıl'})`;
-            }
-        }
+        render(d, profile);
 
-        function updatePageContent(user, paymentStatus) {
-            const now = new Date();
-            const trialEnd = user.trial_end_date ? new Date(user.trial_end_date) : null;
-            const planEnd = user.plan_end_date ? new Date(user.plan_end_date) : null;
+        // 2 sn sonra panele
+        setTimeout(()=>{ location.href='/dashboard.html' }, 2000);
 
-            if (paymentStatus === 'success') {
-                // Paid user success
-                document.getElementById('mainTitle').textContent = 'Ödeme Başarılı!';
-                document.getElementById('mainSubtitle').textContent = 'Planınız aktifleştirildi. WhatsApp asistanınız hazır!';
-                document.getElementById('statusBadge').textContent = 'Aktif';
-                document.getElementById('statusBadge').style.background = '#dcfce7';
-                document.getElementById('statusBadge').style.color = '#166534';
-                
-                // Hide trial info for paid users
-                document.getElementById('trialInfo').style.display = 'none';
-            } else if (user.subscription_status === 'trial' && trialEnd && trialEnd > now) {
-                // Trial user success
-                document.getElementById('mainTitle').textContent = 'Ücretsiz Deneme Başladı!';
-                document.getElementById('mainSubtitle').textContent = '14 günlük ücretsiz deneme süreniz başladı.';
-                document.getElementById('statusBadge').textContent = 'Trial Aktif';
-                document.getElementById('statusBadge').style.background = '#fef3c7';
-                document.getElementById('statusBadge').style.color = '#92400e';
-                
-                // Calculate remaining trial days
-                const remainingDays = Math.ceil((trialEnd - now) / (1000 * 60 * 60 * 24));
-                document.getElementById('trialCountdown').textContent = `${remainingDays} gün kaldı`;
-                document.getElementById('trialDetails').textContent = `${user.monthly_quota || 1000} mesaj hakkınız var. Süre veya kota bittiğinde plan seçimi gerekli.`;
-            } else if (user.subscription_status === 'active' && planEnd && planEnd > now) {
-                // Active user
-                document.getElementById('mainTitle').textContent = 'Hesabınız Aktif!';
-                document.getElementById('mainSubtitle').textContent = 'WhatsApp asistanınız çalışıyor.';
-                document.getElementById('statusBadge').textContent = 'Aktif';
-                document.getElementById('statusBadge').style.background = '#dcfce7';
-                document.getElementById('statusBadge').style.color = '#166534';
-                
-                // Show plan end date instead of trial info
-                const remainingDays = Math.ceil((planEnd - now) / (1000 * 60 * 60 * 24));
-                document.getElementById('trialCountdown').textContent = `${remainingDays} gün kaldı`;
-                document.getElementById('trialDetails').textContent = `Planınız ${planEnd.toLocaleDateString('tr-TR')} tarihine kadar aktif.`;
-            } else {
-                // Expired user
-                document.getElementById('mainTitle').textContent = 'Hesap Bulundu!';
-                document.getElementById('mainSubtitle').textContent = 'Ancak aboneliğinizin süresi dolmuş.';
-                document.getElementById('statusBadge').textContent = 'Süresi Dolmuş';
-                document.getElementById('statusBadge').style.background = '#fecaca';
-                document.getElementById('statusBadge').style.color = '#991b1b';
-                
-                // Show renewal message
-                document.getElementById('trialCountdown').textContent = 'Plan Yenileme Gerekli';
-                document.getElementById('trialDetails').innerHTML = 'Devam etmek için <a href="payment.html?phone=' + encodeURIComponent(user.contact_phone) + '" style="color: #2563eb;">plan yenileyin</a>.';
-            }
-        }
+      }catch(e){
+        console.error('Load error:',e);
+        showErr(e.message);
+      }
+    }
 
-        function showDefaultSuccess() {
-            // Default success message when user data is not available
-            document.getElementById('userName').textContent = 'Kullanıcı';
-            document.getElementById('companyName').textContent = 'Şirket';
-            document.getElementById('phoneNumber').textContent = userPhone || 'Telefon';
-            document.getElementById('planName').textContent = 'TRIAL';
-            document.getElementById('quotaNumber').textContent = '1000';
-            document.getElementById('quotaLabel').textContent = 'mesaj (14 gün deneme)';
-        }
+    function render(d, profile){
+      document.getElementById('loading').style.display='none';
+      document.getElementById('success').style.display='block';
 
-        function updateTrialCountdown() {
-            // This will be updated with actual user data when loaded
-            const now = new Date();
-            const trialEnd = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
-            const timeLeft = trialEnd - now;
-            const daysLeft = Math.ceil(timeLeft / (1000 * 60 * 60 * 24));
-            
-            if (!document.getElementById('trialCountdown').textContent.includes('kaldı')) {
-                document.getElementById('trialCountdown').textContent = `${daysLeft} gün kaldı`;
-            }
-        }
+      if(d.customer){
+        document.getElementById('name').textContent=d.customer.name||'-';
+        document.getElementById('company').textContent=d.customer.company||'-';
+        document.getElementById('welcomeMsg').textContent=`${d.customer.name||'Hoş geldiniz'}, ödeme tamamlandı!`;
+      }
+      document.getElementById('phone').textContent=d.customer_phone||'-';
 
-        function setupAutoRedirect() {
-            // Auto-open WhatsApp after 5 seconds (optional)
-            setTimeout(() => {
-                if (confirm('WhatsApp\'ı şimdi açmak ister misiniz?')) {
-                    window.open('https://wa.me/14155238886?text=Merhaba,%20yeni%20kaydoldum', '_blank');
-                }
-            }, 5000);
-        }
+      const planName=planNames[d.plan]||d.plan;
+      const billing=d.billing_cycle==='yearly'?'Yıllık':'Aylık';
+      document.getElementById('plan').textContent=`${planName} - ${billing}`;
+      document.getElementById('purchasedQuota').textContent=fmtNumber(d.quota||d.new_quota)+' mesaj';
+      document.getElementById('amount').textContent='$'+(d.amount||0).toFixed(2);
 
-        // Track successful registration/payment
-        console.log('Success page loaded for:', userPhone, 'Plan:', selectedPlan, 'Payment:', paymentStatus);
-    </script>
+      if(d.customer_phone){
+        document.getElementById('waBtn').href=`https://wa.me/12203450200?text=Merhaba, ${encodeURIComponent(d.customer_phone)} için ödeme yaptım`;
+      }
+
+      if(profile && profile.exists){
+        const total = profile.monthly_quota ?? d.customer?.monthly_quota;
+        const used  = profile.used_quota ?? d.customer?.used_quota;
+        const remaining = Math.max(0, (total||0) - (used||0));
+
+        document.getElementById('currentQuota').textContent = fmtNumber(total)+' mesaj';
+        document.getElementById('usedQuota').textContent    = fmtNumber(used)+' mesaj';
+        document.getElementById('remainingQuota').textContent = fmtNumber(remaining)+' mesaj';
+
+        document.getElementById('planStart').textContent = fmtDate(profile.plan_start_date);
+        document.getElementById('planEnd').textContent   = fmtDate(profile.plan_end_date);
+        document.getElementById('trialEnd').textContent  = fmtDate(profile.trial_end_date);
+      }
+      confetti();
+    }
+
+    function showErr(msg){
+      document.getElementById('loading').style.display='none';
+      document.getElementById('error').style.display='block';
+      document.getElementById('errorMsg').textContent=msg;
+    }
+
+    function confetti(){
+      const colors=['#2563eb','#10b981','#f59e0b','#ef4444','#8b5cf6'];
+      for(let i=0;i<50;i++){
+        setTimeout(()=>{
+          const c=document.createElement('div');
+          c.style.cssText='position:fixed;width:10px;height:10px;border-radius:50%;pointer-events:none;z-index:9999';
+          c.style.backgroundColor=colors[Math.floor(Math.random()*colors.length)];
+          c.style.left=Math.random()*100+'vw';
+          c.style.top='-10px';
+          document.body.appendChild(c);
+          c.animate([{transform:'translateY(0) rotate(0)',opacity:1},{transform:'translateY(100vh) rotate(360deg)',opacity:0}],{duration:3000}).onfinish=()=>c.remove();
+        },i*80);
+      }
+    }
+
+    window.addEventListener('load',load);
+  </script>
 </body>
 </html>
+

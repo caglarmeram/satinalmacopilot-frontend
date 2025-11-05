@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Satınalma CoPilot — Admin</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E🤖%3C/text%3E%3C/svg%3E">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#0b1220;--panel:#101a2b;--muted:#8aa0be;--text:#e6eefc;--primary:#3b82f6;--ok:#10b981;--danger:#ef4444;--border:#1f2a3d}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial;color:var(--text);background:var(--bg)}
+    .shell{max-width:1200px;margin:24px auto;padding:0 16px}
+    .bar{display:flex;gap:12px;align-items:center;background:var(--panel);padding:14px;border-radius:12px;border:1px solid var(--border)}
+    .bar input,.bar select{background:#0d1626;border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;min-width:280px}
+    .btn{background:var(--primary);color:#fff;border:0;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .btn.ghost{background:#0d1626;border:1px solid var(--border)}
+    .pill{background:#0d1626;border:1px solid var(--border);padding:6px 10px;border-radius:999px;color:var(--muted);cursor:pointer}
+    .pill.active{background:var(--primary);border-color:transparent;color:#fff}
+    .tabs{display:flex;gap:10px;margin:16px 0;flex-wrap:wrap}
+    .panel{background:var(--panel);border:1px solid var(--border);padding:16px;border-radius:12px;margin-bottom:18px}
+    h1{margin:12px 0 8px;font-size:28px} h2{margin:0 0 12px} h3{margin:0 0 10px;font-size:18px}
+    table{width:100%;border-collapse:collapse} th,td{padding:12px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+    .kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .card{background:#0d1626;border:1px solid var(--border);border-radius:12px;padding:16px}
+    .muted{color:var(--muted)}
+    .ok{color:var(--ok)} .bad{color:var(--danger)}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .tag{font-variant-numeric:tabular-nums}
+    .mini{font-size:12px;color:var(--muted)}
+    .right{display:flex;gap:10px;margin-left:auto}
+    .input{background:#0d1626;border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px}
+    .nowrap{white-space:nowrap}
+    .error{color:var(--danger);margin-top:8px}
+    textarea.input{min-width:100%;max-width:100%}
+    code{background:#0d1626;padding:2px 6px;border-radius:4px;font-size:13px}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <h1>Satınalma CoPilot – Admin</h1>
+
+    <!-- Admin Bar -->
+    <div class="bar" id="adminBar">
+      <label>API Base
+        <select id="apiBase">
+          <option>https://api.satinalmacopilot.com</option>
+          <option>http://localhost:3001</option>
+        </select>
+      </label>
+      <label>Admin Token
+        <input id="adminToken" placeholder="Admin token">
+      </label>
+      <button class="btn" id="saveBar">Kaydet</button>
+      <button class="btn ghost" id="pingBtn">Ping</button>
+      <span id="apiStatus" class="pill">API…</span>
+      <span class="right">
+        <button class="btn ghost" onclick="window.location.href='/'">🏠 Ana Sayfa</button>
+      </span>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <span class="pill active" data-tab="metrics">Metrics</span>
+      <span class="pill" data-tab="customers">Customers</span>
+      <span class="pill" data-tab="plans">Plans</span>
+      <span class="pill" data-tab="affiliate">Affiliate</span>
+      <span class="pill" data-tab="email">Email Management</span>
+      <span class="pill" data-tab="audit">Audit</span>
+      <span class="pill" data-tab="testimonials">Testimonials</span>
+      <span class="pill" data-tab="settings">Settings</span>
+    </div>
+
+    <!-- Metrics -->
+    <section class="panel" id="tab-metrics">
+      <h2>Özet</h2>
+      <div class="kpi">
+        <div class="card">
+          <div class="muted">Toplam Müşteri</div>
+          <div style="font-size:26px;font-weight:700" id="kpiTotal">—</div>
+          <div class="mini">Paid: <span id="kpiPaid">—</span>, Trial: <span id="kpiTrial">—</span></div>
+        </div>
+        <div class="card">
+          <div class="muted">Aktif Abonelik</div>
+          <div style="font-size:26px;font-weight:700" id="kpiActive">—</div>
+          <div class="mini">trial + paid</div>
+        </div>
+        <div class="card">
+          <div class="muted">Tahmini MRR (USD)</div>
+          <div style="font-size:26px;font-weight:700" id="kpiMRR">—</div>
+          <div class="mini">Aylık tekrarlayan gelir</div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn" id="refreshMetrics">Yenile</button>
+        <span id="metricsNote" class="mini">Veriler güncellendi.</span>
+      </div>
+    </section>
+
+    <!-- Customers -->
+    <section class="panel" id="tab-customers" style="display:none">
+      <h2>Customers</h2>
+      <div style="overflow:auto">
+        <table id="custTable">
+          <thead>
+            <tr><th>Ad</th><th>Telefon</th><th>Plan</th><th>Durum</th><th>Toplam Kota</th><th>Kullanım</th><th>Kalan</th><th>İşlem</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Plans -->
+    <section class="panel" id="tab-plans" style="display:none">
+      <h2>Planlar</h2>
+      <div style="overflow:auto">
+        <table id="plansTable">
+          <thead>
+            <tr>
+              <th>ID</th><th>Döngü</th><th>Fiyat</th><th>Quota</th><th>$/mesaj</th><th>Adv.</th>
+              <th>Recurring</th><th>Interval</th><th>Stripe Price (LIVE)</th><th>Stripe Price (TEST)</th><th>Sıra</th><th>Aktif</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div id="plansErr" class="error"></div>
+        <div class="row" style="margin-top:8px">
+          <button class="btn ghost" id="plansReload">Yenile</button>
+          <button class="btn" id="saveReorder">Sıralamayı Kaydet</button>
+          <span class="mini" id="reorderMsg"></span>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:14px">
+        <h3>Plan Upsert</h3>
+        <div class="row">
+          <select id="upPlan" class="input">
+            <option value="basic">basic</option>
+            <option value="pro">pro</option>
+            <option value="max">max</option>
+          </select>
+          <select id="upCycle" class="input">
+            <option value="monthly">monthly</option>
+            <option value="yearly">yearly</option>
+          </select>
+          <input id="upPrice" class="input" placeholder="price_usd" type="number" step="0.01" style="max-width:140px">
+          <input id="upQuota" class="input" placeholder="quota" type="number" step="1" style="max-width:140px">
+          <label class="mini"><input type="checkbox" id="upActive" checked> aktif</label>
+          <label class="mini"><input type="checkbox" id="upRecurring"> is_recurring</label>
+          <select id="upInterval" class="input" style="max-width:140px">
+            <option value="month">month</option>
+            <option value="year">year</option>
+          </select>
+          <input id="upOrder" class="input" placeholder="display_order" type="number" step="1" style="max-width:160px">
+          <button class="btn" id="upSave">Kaydet</button>
+          <span id="upMsg" class="mini"></span>
+        </div>
+        <div class="row" style="margin-top:10px;flex-direction:column;gap:6px">
+          <label class="mini">Stripe Price ID'leri</label>
+          <div class="row">
+            <input id="upStripeLive" class="input" placeholder="stripe_price_live" style="min-width:280px">
+            <input id="upStripeTest" class="input" placeholder="stripe_price_test" style="min-width:280px">
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px;flex-direction:column;gap:6px">
+          <input id="upDesc" class="input" placeholder="description">
+          <input id="upBadge" class="input" placeholder="badge_text">
+          <textarea id="upFeatures" class="input" rows="4" placeholder="Plan özellikleri (her satır bir özellik)"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- Affiliate -->
+    <section class="panel" id="tab-affiliate" style="display:none">
+      <h2>Affiliate Yönetimi</h2>
+      <div class="card" style="margin-bottom:16px">
+        <h3>Genel İstatistikler</h3>
+        <div class="kpi" style="grid-template-columns:repeat(4,1fr)">
+          <div class="card">
+            <div class="muted">Aktif Referrerlar</div>
+            <div style="font-size:24px;font-weight:700" id="affActive">—</div>
+          </div>
+          <div class="card">
+            <div class="muted">Toplam Referanslar</div>
+            <div style="font-size:24px;font-weight:700" id="affTotal">—</div>
+          </div>
+          <div class="card">
+            <div class="muted">Dağıtılan Bonus</div>
+            <div style="font-size:24px;font-weight:700" id="affBonus">—</div>
+          </div>
+          <div class="card">
+            <div class="muted">Conversion Rate</div>
+            <div style="font-size:24px;font-weight:700" id="affConv">—</div>
+          </div>
+        </div>
+        <button class="btn" id="affRefresh" style="margin-top:12px">Yenile</button>
+      </div>
+      <div class="card">
+        <h3>Top Referrerlar</h3>
+        <div style="overflow:auto">
+          <table id="affTable">
+            <thead>
+              <tr>
+                <th>Kullanıcı</th>
+                <th>Referral Kodu</th>
+                <th>Referanslar</th>
+                <th>Toplam Bonus</th>
+                <th>İşlemler</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:16px">
+        <h3>Affiliate Ayarları</h3>
+        <div class="row">
+          <label>Kayıt Bonusu (mesaj)
+            <input id="affSignupBonus" class="input" type="number" min="0" value="300" style="max-width:160px">
+          </label>
+          <label>Ödeme Oranı (%)
+            <input id="affPaymentRatio" class="input" type="number" min="0" max="100" step="1" value="10" style="max-width:160px">
+          </label>
+          <button class="btn" id="affSaveSettings">Kaydet</button>
+          <span id="affMsg" class="mini"></span>
+        </div>
+        <div class="mini" style="margin-top:8px">
+          Signup Bonus: Yeni kayıt bonusu<br>
+          Payment Ratio: Referansın ödemelerinde verilen oran
+        </div>
+      </div>
+    </section>
+
+<!-- Email Management (Manual) -->
+<section class="panel" id="tab-email" style="display:none">
+  <h2>📧 Email Yönetimi</h2>
+  
+  <div class="card">
+    <h3>Aktif Email: info@satinalmacopilot.com</h3>
+    <p style="color:var(--muted);margin-bottom:20px;line-height:1.6">
+      Email yönetimi için ProMail panelini kullanın.
+    </p>
+    
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px">
+      <a href="https://mail.satinalmacopilot.com" target="_blank" class="card" style="text-decoration:none;cursor:pointer;transition:all 0.2s;text-align:center">
+        <div style="font-size:2.5rem;margin-bottom:8px">📬</div>
+        <h3 style="margin-bottom:4px;color:var(--text)">Webmail Giriş</h3>
+        <p class="muted" style="font-size:0.9rem">Mail okuma ve gönderme</p>
+      </a>
+      
+      <a href="https://hosting.com.tr/musteri-paneli/hizmet?id=72241#tabMailboxes" target="_blank" class="card" style="text-decoration:none;cursor:pointer;transition:all 0.2s;text-align:center">
+        <div style="font-size:2.5rem;margin-bottom:8px">⚙️</div>
+        <h3 style="margin-bottom:4px;color:var(--text)">Hosting Panel</h3>
+        <p class="muted" style="font-size:0.9rem">Şifre değiştir, kota ayarla</p>
+      </a>
+    </div>
+    
+    <div class="panel" style="background:#0d1626;margin-top:20px">
+      <h4 style="margin-bottom:12px">📋 Email Bilgileri</h4>
+      <table>
+        <tbody>
+          <tr>
+            <td style="width:200px"><strong>Email Adresi</strong></td>
+            <td><code>info@satinalmacopilot.com</code></td>
+          </tr>
+          <tr>
+            <td><strong>Amaç</strong></td>
+            <td>Genel iletişim, müşteri soruları</td>
+          </tr>
+          <tr>
+            <td><strong>SMTP Sunucu</strong></td>
+            <td><code>mail.satinalmacopilot.com</code></td>
+          </tr>
+          <tr>
+            <td><strong>SMTP Port</strong></td>
+            <td><code>587</code> (TLS) veya <code>465</code> (SSL)</td>
+          </tr>
+          <tr>
+            <td><strong>IMAP Sunucu</strong></td>
+            <td><code>mail.satinalmacopilot.com</code></td>
+          </tr>
+          <tr>
+            <td><strong>IMAP Port</strong></td>
+            <td><code>993</code> (SSL)</td>
+          </tr>
+          <tr>
+            <td><strong>POP3 Sunucu</strong></td>
+            <td><code>mail.satinalmacopilot.com</code></td>
+          </tr>
+          <tr>
+            <td><strong>POP3 Port</strong></td>
+            <td><code>995</code> (SSL)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <div class="panel" style="background:#1a2332;margin-top:16px">
+      <h4 style="margin-bottom:8px">✅ DNS Durumu</h4>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
+        <div class="card" style="text-align:center">
+          <div style="font-size:1.5rem;margin-bottom:4px">✅</div>
+          <div class="muted mini">MX Records</div>
+          <div style="font-size:0.9rem;margin-top:4px">Aktif</div>
+        </div>
+        <div class="card" style="text-align:center">
+          <div style="font-size:1.5rem;margin-bottom:4px">✅</div>
+          <div class="muted mini">SPF Record</div>
+          <div style="font-size:0.9rem;margin-top:4px">Aktif</div>
+        </div>
+        <div class="card" style="text-align:center">
+          <div style="font-size:1.5rem;margin-bottom:4px">✅</div>
+          <div class="muted mini">DKIM Record</div>
+          <div style="font-size:0.9rem;margin-top:4px">Aktif</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+    <!-- Audit -->
+    <section class="panel" id="tab-audit" style="display:none">
+      <h2>Audit</h2>
+      <div class="row">
+        <input id="auditAction" class="input" placeholder="action" style="min-width:260px">
+        <input id="auditDetail" class="input" placeholder="detail" style="flex:1">
+        <button class="btn" id="auditSave">Kaydet</button>
+      </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="panel" id="tab-testimonials" style="display:none">
+      <h2>Testimonials</h2>
+      <div style="overflow:auto;margin-top:10px">
+        <table id="tmTable">
+          <thead><tr><th>Ad</th><th>Ünvan</th><th>İçerik</th><th>Aktif</th><th>İşlem</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="panel" style="margin-top:14px">
+        <h3>Yeni / Güncelle</h3>
+        <div class="row">
+          <input id="tmId" class="input" placeholder="id (boş=insert)" style="min-width:300px">
+        </div>
+        <div class="row">
+          <input id="tmName" class="input" placeholder="Ad Soyad" style="min-width:260px">
+          <input id="tmTitle" class="input" placeholder="Ünvan" style="min-width:320px">
+        </div>
+        <div class="row">
+          <textarea id="tmContent" class="input" placeholder="İçerik" rows="3" style="width:100%"></textarea>
+        </div>
+        <div class="row">
+          <label class="mini"><input type="checkbox" id="tmActive" checked> aktif</label>
+          <button class="btn" id="tmSave">Kaydet</button>
+          <button class="btn ghost" id="tmClear">Temizle</button>
+          <span id="tmMsg" class="mini"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Settings -->
+    <section class="panel" id="tab-settings" style="display:none">
+      <h2>Ayarlar</h2>
+      <div class="row">
+        <label>Trial (gün)
+          <input id="stTrialDays" class="input" type="number" min="0" value="14" style="min-width:140px">
+        </label>
+        <label>Trial (kota)
+          <input id="stTrialQuota" class="input" type="number" min="0" value="1000" style="min-width:160px">
+        </label>
+        <label>Stripe Mode
+          <select id="stStripeMode" class="input">
+            <option value="test">test</option>
+            <option value="live">live</option>
+          </select>
+        </label>
+        <button class="btn" id="stSave">Kaydet</button>
+        <button class="btn ghost" id="stReload">Yenile</button>
+        <span id="stMsg" class="mini"></span>
+      </div>
+    </section>
+  </div>
+
+<script>
+const DEFAULT_API_BASE = 'https://api.satinalmacopilot.com';
+let API_BASE = localStorage.getItem('apiBase') || DEFAULT_API_BASE;
+let ADMIN_TOKEN = localStorage.getItem('adminToken') || '';
+
+const $ = sel => document.querySelector(sel);
+const fmt = n => Number(n).toLocaleString('tr-TR');
+
+const handleFetch = async (url, opt={})=>{
+  if (!opt.headers) opt.headers = {};
+  if (ADMIN_TOKEN && !opt.headers['x-admin-token']) {
+    opt.headers['x-admin-token'] = ADMIN_TOKEN;
+  }
+  delete opt.headers.Authorization;
+
+  const res = await fetch(url, opt);
+  const text = await res.text().catch(()=> '');
+  if(!res.ok){
+    if([401,403,503].includes(res.status)) setStatus(false);
+    const err = new Error(`HTTP ${res.status} - ${text.slice(0,180)}`);
+    err.status = res.status;
+    throw err;
+  }
+  try{ return JSON.parse(text || '{}'); }catch{ return {}; }
+};
+
+function setStatus(ok){
+  const p = $('#apiStatus');
+  p.textContent = ok?'API OK':'API ERR';
+  p.className='pill '+(ok?'':'bad');
+}
+
+$('#apiBase').value = API_BASE;
+$('#adminToken').value = ADMIN_TOKEN;
+
+$('#saveBar').onclick = async ()=>{
+  API_BASE = $('#apiBase').value.trim() || DEFAULT_API_BASE;
+  ADMIN_TOKEN = $('#adminToken').value.trim();
+  localStorage.setItem('apiBase', API_BASE);
+  localStorage.setItem('adminToken', ADMIN_TOKEN);
+  await ping();
+};
+
+$('#pingBtn').onclick = ping;
+
+async function ping(){
+  try{
+    const j = await handleFetch(`${API_BASE}/api/admin/settings`, {headers:{'x-admin-token':ADMIN_TOKEN}})
+    setStatus(j?.success===true);
+  }catch(e){ console.error(e); setStatus(false); }
+}
+ping();
+
+/* TABS */
+document.querySelectorAll('.pill[data-tab]').forEach(t=>{
+  t.onclick = ()=>{
+    document.querySelectorAll('.pill[data-tab]').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    const tab = t.getAttribute('data-tab');
+    document.querySelectorAll('[id^="tab-"]').forEach(sec=> sec.style.display='none');
+    $(`#tab-${tab}`).style.display='block';
+    if(tab==='metrics') loadMetrics();
+    if(tab==='customers') loadCustomers();
+    if(tab==='plans') loadPlans();
+    if(tab==='affiliate') loadAffiliate();
+    if(tab==='email') loadEmails();
+    if(tab==='testimonials') loadTestimonials();
+    if(tab==='settings') loadSettings();
+  };
+});
+
+/* METRICS */
+$('#refreshMetrics').onclick = loadMetrics();
+async function loadMetrics(){
+  try{
+    const met = await handleFetch(`${API_BASE}/api/admin/metrics`, {
+      headers:{'x-admin-token':ADMIN_TOKEN}
+    });
+    const m = met?.metrics || {};
+    $('#kpiTotal').textContent = fmt(m.total_customers || 0);
+    $('#kpiActive').textContent = fmt(m.active_customers || 0);
+    $('#kpiTrial').textContent = fmt(m.trials || 0);
+    $('#kpiMRR').textContent = '$' + fmt(m.est_mrr_usd || 0);
+    const paid = (m.active_customers || 0) - (m.trials || 0);
+    $('#kpiPaid').textContent = fmt(Math.max(0, paid));
+    $('#metricsNote').textContent = 'Veriler güncellendi.';
+  }catch(e){
+    console.error(e);
+    $('#metricsNote').textContent = 'Hata: metrics yüklenemedi.';
+  }
+}
+
+/* CUSTOMERS */
+async function loadCustomers(){
+  const tbody = $('#custTable tbody'); tbody.innerHTML = '';
+  try{
+    const j = await handleFetch(`${API_BASE}/api/admin/customers`, {
+      headers:{'x-admin-token':ADMIN_TOKEN}
+    });
+    const rows = (j?.customers)||[];
+    rows.forEach(c=>{
+      const totalQuota = Number(c.monthly_quota||0);
+      const used = Number(c.used_quota||0);
+      const remain = totalQuota - used;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${escapeHtml(c.name||'')}</td>
+        <td>${escapeHtml(c.contact_phone||'')}</td>
+        <td>${escapeHtml(`${c.subscription_plan||'-'} / ${c.billing_cycle||'-'}`)}</td>
+        <td>${escapeHtml(c.subscription_status||'-')}</td>
+        <td class="tag">${fmt(totalQuota)}</td>
+        <td class="tag">${fmt(used)}</td>
+        <td class="tag ${remain<0?'bad':''}">${fmt(remain)}</td>
+        <td class="nowrap">
+          <button class="btn ghost" data-inc="+100">+100</button>
+          <button class="btn ghost" data-set="1">Set…</button>
+        </td>`;
+      tr.querySelector('[data-inc]').onclick = ()=> adjustQuota(c.id, 100);
+      tr.querySelector('[data-set]').onclick = async ()=>{
+        const val = prompt('Yeni toplam kota:','6000');
+        if(!val) return;
+        await setQuota(c.id, Number(val));
+      };
+      tbody.appendChild(tr);
+    });
+  }catch(e){
+    console.error(e);
+    tbody.innerHTML = `<tr><td colspan="8" class="bad">Hata: customers yüklenemedi.</td></tr>`;
+  }
+}
+
+async function adjustQuota(customerId, incr){
+  try{
+    await handleFetch(`${API_BASE}/api/admin/quota/increment`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-admin-token':ADMIN_TOKEN},
+      body:JSON.stringify({ customer_id: customerId, add: incr, days: 0 })
+    });
+    await loadCustomers();
+  }catch(e){ alert('Hata: '+e.message); }
+}
+
+async function setQuota(customerId, quota){
+  try{
+    await handleFetch(`${API_BASE}/api/admin/quota/set`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-admin-token':ADMIN_TOKEN},
+      body:JSON.stringify({ customer_id: customerId, new_quota: Number(quota) })
+    });
+    await loadCustomers();
+  }catch(e){ alert('Hata: '+e.message); }
+}
+
+/* PLANS */
+let upBusy = false; let upTimer=null;
+$('#plansReload').onclick = loadPlans;
+const reorderState = new Map();
+
+async function loadPlans(){
+  const tbody = $('#plansTable tbody'); tbody.innerHTML='';
+  $('#plansErr').textContent = '';
+  try{
+    const j = await handleFetch(`${API_BASE}/api/admin/plans`, {
+      headers:{'x-admin-token':ADMIN_TOKEN}
+    });
+    const plans = j?.plans || [];
+    const unitCost = p => Number(p.price_usd) / Math.max(1, Number(p.quota || 0));
+    const allCpms = plans.map(unitCost);
+    const globalMax = Math.max(...allCpms);
+    const advMap = Object.fromEntries(
+      plans.map(p => {
+        const v = unitCost(p);
+        const adv = globalMax > 0 ? ((globalMax - v) / globalMax) * 100 : 0;
+        return [`${p.plan_code}|${p.billing_cycle}`, Math.round(adv)];
+      })
+    );
+    tbody.innerHTML = plans.map(p=>{
+      const cpm = unitCost(p);
+      const adv = advMap[`${p.plan_code}|${p.billing_cycle}`] ?? 0;
+      const key = `${p.plan_code}|${p.billing_cycle}`;
+      const order = Number(p.display_order || 0);
+      reorderState.set(key, order);
+      return `
+        <tr data-key="${escapeHtml(key)}">
+          <td>${escapeHtml(p.plan_code)}</td>
+          <td>${escapeHtml(p.billing_cycle)}</td>
+          <td>$ ${Number(p.price_usd).toFixed(2)}</td>
+          <td>${fmt(p.quota)}</td>
+          <td>$ ${cpm.toFixed(4)}</td>
+          <td>% ${adv}</td>
+          <td>${p.is_recurring ? '✓' : '—'}</td>
+          <td>${escapeHtml(p.interval || '')}</td>
+          <td class="mini">${escapeHtml(p.stripe_price_live || '—')}</td>
+          <td class="mini">${escapeHtml(p.stripe_price_test || '—')}</td>
+          <td><input class="input" type="number" step="1" style="max-width:100px" value="${order}" data-order></td>
+          <td>${p.is_active ? '✓' : '—'}</td>
+        </tr>`;
+    }).join('');
+    tbody.querySelectorAll('tr').forEach(tr=>{
+      const key = tr.getAttribute('data-key');
+      const inp = tr.querySelector('[data-order]');
+      if(!inp) return;
+      inp.onchange = ()=> reorderState.set(key, Number(inp.value || 0));
+    });
+  }catch(e){
+    console.error(e);
+    $('#plansErr').textContent = `Hata: ${e.message}`;
+  }
+}
+
+$('#saveReorder').onclick = async ()=>{
+  try{
+    const payload = [];
+    reorderState.forEach((display_order, key)=>{
+      const [plan_code, billing_cycle] = key.split('|');
+      payload.push({ plan_code, billing_cycle, display_order });
+    });
+    if(!payload.length){ $('#reorderMsg').textContent='Veri yok.'; return; }
+    await handleFetch(`${API_BASE}/api/admin/plans/reorder`,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json','x-admin-token':ADMIN_TOKEN},
+      body: JSON.stringify(payload)
+    });
+    $('#reorderMsg').textContent='Kaydedildi.';
+    setTimeout(()=> $('#reorderMsg').textContent='',1500);
+    await loadPlans();
+  }catch(e){
+    $('#reorderMsg').textContent='Hata: '+e.message;
+  }
+};
+
+$('#upSave').onclick = ()=>{
+  if(upBusy) return;
+  clearTimeout(upTimer);
+  $('#upMsg').textContent = 'Gönderiliyor…';
+  upTimer = setTimeout(doUpsertPlan, 350);
+};
+
+async function doUpsertPlan(){upBusy = true; $('#upSave').disabled = true;
+  try{
+    const body = {
+      plan_code: $('#upPlan').value,
+      billing_cycle: $('#upCycle').value,
+      price_usd: Number($('#upPrice').value),
+      quota: Number($('#upQuota').value),
+      is_active: $('#upActive').checked,
+      is_recurring: $('#upRecurring').checked,
+      interval: $('#upInterval').value,
+      display_order: ($('#upOrder').value===''? null : Number($('#upOrder').value))
+    };
+    const live = ($('#upStripeLive').value||'').trim();
+    const test = ($('#upStripeTest').value||'').trim();
+    if(live) body.stripe_price_live = live;
+    if(test) body.stripe_price_test = test;
+    const desc = ($('#upDesc').value||'').trim();
+    const badge = ($('#upBadge').value||'').trim();
+    if(desc) body.description = desc;
+    if(badge) body.badge_text = badge;
+    const raw = ($('#upFeatures').value || '').split('\n').map(s => s.trim()).filter(Boolean);
+    body.features = raw;
+    await handleFetch(`${API_BASE}/api/admin/plans/upsert`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-admin-token':ADMIN_TOKEN},
+      body: JSON.stringify(body)
+    });
+    $('#upMsg').textContent = 'Kaydedildi.';
+    await loadPlans();
+  }catch(e){
+    console.error(e);
+    $('#upMsg').textContent = 'Hata: ' + e.message;
+  }finally{
+    upBusy = false; $('#upSave').disabled = false;
+    setTimeout(()=> $('#upMsg').textContent='', 2500);
+  }
+}
+
+/* AFFILIATE */
+$('#affRefresh').onclick = loadAffiliate;
+
+async function loadAffiliate(){
+  try {
+    const stats = await handleFetch(`${API_BASE}/api/admin/customers`, {
+      headers:{'x-admin-token':ADMIN_TOKEN}
+    });
+    const custs = stats?.customers || [];
+
+    const activeReferrers = custs.filter(c => c.affiliate_enabled).length;
+    const totalReferred = custs.filter(c => c.referred_by).length;
+
+    $('#affActive').textContent = activeReferrers;
+    $('#affTotal').textContent = totalReferred;
+    $('#affBonus').textContent = '—';
+    $('#affConv').textContent = activeReferrers > 0 ? ((totalReferred/activeReferrers).toFixed(1)) : '0';
+
+    const tbody = $('#affTable tbody');
+    tbody.innerHTML = '';
+
+    const referrers = custs.filter(c => c.referral_code);
+    const referrerStats = referrers.map(r => {
+      const refs = custs.filter(c => c.referred_by === r.referral_code);
+      return { ...r, ref_count: refs.length };
+    }).sort((a,b) => b.ref_count - a.ref_count).slice(0, 10);
+
+    referrerStats.forEach(r => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${escapeHtml(r.name || '')}<br><span class="mini">${escapeHtml(r.company_name || '')}</span></td>
+        <td><code>${escapeHtml(r.referral_code || '')}</code></td>
+        <td class="tag">${r.ref_count}</td>
+        <td class="tag">—</td>
+        <td><button class="btn ghost" onclick="alert('Detay yakında')">Detay</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+  } catch(e) {
+    console.error('Affiliate load error:', e);
+    $('#affActive').textContent = 'Hata';
+  }
+}
+
+$('#affSaveSettings').onclick = async () => {
+  const signup = Number($('#affSignupBonus').value || 300);
+  const ratio = Number($('#affPaymentRatio').value || 10);
+  $('#affMsg').textContent = 'Affiliate ayarları app_settings tablosuna yazılmalı (backend endpoint gerekli)';
+  setTimeout(()=> $('#affMsg').textContent='', 3000);
+};
+
+/* EMAIL MANAGEMENT */
+$('#emailRefresh').onclick = loadEmails;
+
+async function loadEmails(){
+  const tbody = $('#emailTable tbody');
+  tbody.innerHTML = '<tr><td colspan="5" class="muted">Yükleniyor...</td></tr>';
+  
+  try {
+    const j = await handleFetch(`${API_BASE}/api/admin/emails`, {
+      headers:{'x-admin-token':ADMIN_TOKEN}
+    });
+    
+    const emails = j?.emails || [];
+    
+    if (emails.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="muted">Henüz mailbox yok</td></tr>';
+      return;
+    }
+    
+    tbody.innerHTML = emails.map(e => {
+      const usage = e.used && e.quota ? Math.round((e.used / e.quota) * 100) : 0;
+      const statusClass = e.status === 'active' ? 'ok' : 'muted';
+      return `
+        <tr>
+          <td><code>${escapeHtml(e.email)}</code></td>
+          <td class="tag">${fmt(e.quota || 0)}</td>
+          <td class="tag">${usage}%</td>
+          <td class="${statusClass}">${escapeHtml(e.status || 'unknown')}</td>
+          <td class="nowrap">
+            <button class="btn ghost" onclick="resetEmailPassword('${escapeHtml(e.email)}')">Şifre Sıfırla</button>
+            <button class="btn ghost" onclick="deleteEmail('${escapeHtml(e.email)}')">Sil</button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+    
+    if (j.note) {
+      const noteRow = `<tr><td colspan="5" class="mini" style="text-align:center;padding:8px">${escapeHtml(j.note)}</td></tr>`;
+      tbody.innerHTML += noteRow;
+    }
+    
+  } catch(e) {
+    console.error('Email load error:', e);
+    tbody.innerHTML = `<tr><td colspan="5" class="bad">Hata: ${escapeHtml(e.message)}</td></tr>`;
+  }
+}
+
+$('#createEmail').onclick = async () => {
+  const user = $('#newEmailUser').value.trim();
+  const pass = $('#newEmailPass').value;
+  const quota = Number($('#newEmailQuota').value) || 1024;
+  
+  if (!user || !pass) {
+    $('#emailMsg').textContent = '❌ Kullanıcı adı ve şifre gerekli';
+    setTimeout(()=> $('#emailMsg').textContent='', 3000);
+    return;
+  }
+  
+  if (pass.length < 8) {
+    $('#emailMsg').textContent = '❌ Şifre en az 8 karakter olmalı';
+    setTimeout(()=> $('#emailMsg').textContent='', 3000);
+    return;
+  }
+  
+  $('#emailMsg').textContent = 'Oluşturuluyor...';
+  $('#createEmail').disabled = true;
+  
+  try {
+    await handleFetch(`${API_BASE}/api/admin/emails`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-admin-token': ADMIN_TOKEN
+      },
+      body: JSON.stringify({ username: user, password: pass, quota })
+    });
+    
+    $('#emailMsg').textContent = '✅ Mailbox oluşturuldu';
+    $('#newEmailUser').value = '';
+    $('#newEmailPass').value = '';
+    $('#newEmailQuota').value = '1024';
+    
+    setTimeout(()=> {
+      $('#emailMsg').textContent = '';
+      loadEmails();
+    }, 2000);
+    
+  } catch(e) {
+    console.error('Create email error:', e);
+    $('#emailMsg').textContent = `❌ Hata: ${e.message}`;
+  } finally {
+    $('#createEmail').disabled = false;
+  }
+};
+
+async function resetEmailPassword(email) {
+  const newPass = prompt(`Yeni şifre (${email}):`, '');
+  if (!newPass || newPass.length < 8) {
+    alert('Şifre en az 8 karakter olmalı');
+    return;
+  }
+  
+  try {
+    await handleFetch(`${API_BASE}/api/admin/emails/${encodeURIComponent(email)}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-admin-token': ADMIN_TOKEN
+      },
+      body: JSON.stringify({ password: newPass })
+    });
+    
+    alert('✅ Şifre güncellendi');
+    loadEmails();
+  } catch(e) {
+    alert(`❌ Hata: ${e.message}`);
+  }
+}
+
+async function deleteEmail(email) {
+  if (!confirm(`${email} silinsin mi?`)) return;
+  
+  try {
+    await handleFetch(`${API_BASE}/api/admin/emails/${encodeURIComponent(email)}`, {
+      method: 'DELETE',
+      headers: {'x-admin-token': ADMIN_TOKEN}
+    });
+    
+    alert('✅ Mailbox silindi');
+    loadEmails();
+  } catch(e) {
+    alert(`❌ Hata: ${e.message}`);
+  }
+}
+
+/* AUDIT */
+$('#auditSave').onclick = async ()=>{
+  try{
+    await handleFetch(`${API_BASE}/api/admin/audit`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-admin-token':ADMIN_TOKEN},
+      body: JSON.stringify({action: $('#auditAction').value, detail: $('#auditDetail').value})
+    });
+    alert('Audit kaydedildi.');
+    $('#auditAction').value=''; $('#auditDetail').value='';
+  }catch(e){ alert('Hata: '+e.message); }
+};
+
+/* TESTIMONIALS */
+$('#tmClear').onclick = ()=>{
+  $('#tmId').value=''; $('#tmName').value=''; $('#tmTitle').value=''; $('#tmContent').value=''; $('#tmActive').checked=true;
+};
+
+$('#tmSave').onclick = saveTestimonial;
+
+async function loadTestimonials(){
+  const tbody = $('#tmTable tbody'); tbody.innerHTML='';
+  try{
+    const j = await handleFetch(`${API_BASE}/api/admin/testimonials`, {
+      headers:{'x-admin-token':ADMIN_TOKEN}
+    });
+    const arr = j?.testimonials || [];
+    tbody.innerHTML = arr.map(t=>`
+      <tr>
+        <td>${escapeHtml(t.author_name||'')}</td>
+        <td>${escapeHtml(t.author_title||'')}</td>
+        <td>${escapeHtml(t.content||'')}</td>
+        <td>${t.is_active?'✓':'—'}</td>
+        <td><button class="btn ghost" data-edit="${t.id}">Düzenle</button></td>
+      </tr>
+    `).join('');
+    tbody.querySelectorAll('[data-edit]').forEach(btn=>{
+      btn.onclick = ()=>{
+        const id = btn.getAttribute('data-edit');
+        const t = arr.find(x=> String(x.id)===String(id));
+        $('#tmId').value = t?.id || '';
+        $('#tmName').value = t?.author_name || '';
+        $('#tmTitle').value = t?.author_title || '';
+        $('#tmContent').value = t?.content || '';
+        $('#tmActive').checked = !!t?.is_active;
+        window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
+      };
+    });
+  }catch(e){
+    console.error(e);
+    $('#tmTable tbody').innerHTML = `<tr><td colspan="5" class="bad">Hata: testimonials yüklenemedi.</td></tr>`;
+  }
+}
+
+async function saveTestimonial(){
+  const id = ($('#tmId').value||'').trim();
+  const payload = {
+    author_name: $('#tmName').value.trim(),
+    author_title: $('#tmTitle').value.trim(),
+    content: $('#tmContent').value.trim(),
+    is_active: $('#tmActive').checked
+  };
+  if(!payload.author_name || !payload.content){
+    $('#tmMsg').textContent = 'Ad ve içerik zorunlu.'; return;
+  }
+  try{
+    const url = id
+      ? `${API_BASE}/api/admin/testimonials/${encodeURIComponent(id)}`
+      : `${API_BASE}/api/admin/testimonials`;
+    const method = id ? 'PUT' : 'POST';
+    await handleFetch(url,{
+      method,
+      headers:{'Content-Type':'application/json','x-admin-token':ADMIN_TOKEN},
+      body: JSON.stringify(payload)
+    });
+    $('#tmMsg').textContent = 'Kaydedildi.';
+    setTimeout(()=> $('#tmMsg').textContent='', 1500);
+    $('#tmClear').click();
+    await loadTestimonials();
+  }catch(e){
+    console.error(e);
+    $('#tmMsg').textContent = 'Hata: '+e.message;
+  }
+}
+
+/* SETTINGS */
+async function loadSettings(){
+  try{
+    const j = await handleFetch(`${API_BASE}/api/admin/settings`, {
+      headers:{'x-admin-token':ADMIN_TOKEN}
+    });
+    const s = j?.settings || {};
+    $('#stTrialDays').value = Number(s.trial_days ?? 14);
+    $('#stTrialQuota').value = Number(s.trial_quota ?? 1000);
+    $('#stStripeMode').value = (s.stripe_mode === 'live' ? 'live' : 'test');
+    $('#stMsg').textContent = 'Yüklendi.';
+    setTimeout(()=> $('#stMsg').textContent='', 1200);
+  }catch(e){
+    $('#stMsg').textContent = 'Hata: '+e.message;
+  }
+}
+
+$('#stReload').onclick = loadSettings;
+
+$('#stSave').onclick = async ()=>{
+  try{
+    const payload = {
+      trial_days: Number($('#stTrialDays').value),
+      trial_quota: Number($('#stTrialQuota').value),
+      stripe_mode: $('#stStripeMode').value
+    };
+    await handleFetch(`${API_BASE}/api/admin/settings`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-admin-token':ADMIN_TOKEN},
+      body: JSON.stringify(payload)
+    });
+    $('#stMsg').textContent = 'Kaydedildi.';
+    setTimeout(()=> $('#stMsg').textContent='', 1500);
+  }catch(e){
+    $('#stMsg').textContent = 'Hata: '+e.message;
+  }
+};
+
+/* UTILS */
+function escapeHtml(s=''){
+  const d=document.createElement('div');
+  d.textContent=s;
+  return d.innerHTML;
+}
+
+/* FIRST LOAD */
+loadMetrics();
+</script>
+</body>
+</html>

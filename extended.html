@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Satınalma CoPilot · Genişletilmiş Kayıt</title>
+  <link rel="icon" href="/favicon.ico" />
+  <style>
+    :root{
+      /* Açık tema */
+      --bg:#eef3fb;
+      --card:#ffffff;
+      --muted:#5b6b82;
+      --text:#111827;
+      --pri:#3b82f6;
+      --pri-2:#2563eb;
+      --ok:#16a34a;
+      --warn:#d97706;
+      --err:#dc2626;
+      --bd:1px solid #e5e7eb;
+      --radius:14px;
+      --focus:0 0 0 3px rgba(37,99,235,.25);
+      --chip:#f1f5f9;
+      --chip-active:#e0efff;
+    }
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg:#0b1020; --card:#0f1730; --muted:#93a2b7; --text:#e9eef7;
+        --pri:#6aa0ff; --pri-2:#3c7cff; --ok:#22c55e; --warn:#f59e0b; --err:#ef4444;
+        --bd:1px solid rgba(255,255,255,.08); --focus:0 0 0 3px rgba(58,129,255,.25);
+        --chip:#0a132a; --chip-active:#12224a;
+      }
+    }
+
+    /* Sayfa iskeleti */
+    html,body{height:100%}
+    body{
+      margin:0;
+      font:16px/1.5 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial;
+      color:var(--text);
+      background: radial-gradient(1200px 800px at 60% -20%, #bcd3ff40, transparent), var(--bg);
+    }
+    .container{
+      max-width: 960px;
+      margin: 24px auto 64px;
+      padding: 0 16px;
+    }
+    .header{
+      display:flex; align-items:center; gap:12px; margin-bottom:16px;
+    }
+    .header img{ width:36px; height:36px }
+    .h1{ font-weight:700; font-size:22px }
+    .card{
+      background:var(--card);
+      border:var(--bd);
+      border-radius:var(--radius);
+      padding:22px;
+      box-shadow:0 10px 30px rgba(17,24,39,.06);
+      margin-top:16px;
+    }
+    .row{ display:grid; grid-template-columns:1fr 1fr; gap:16px }
+    @media (max-width: 820px){ .row{ grid-template-columns:1fr } }
+
+    label{ display:block; font-weight:600; margin:10px 0 6px }
+    .help{ font-size:12px; color:var(--muted); margin-top:6px }
+    input[type="text"],input[type="email"],input[type="tel"],select,textarea{
+      width:100%; padding:12px; border-radius:12px; border:var(--bd);
+      background:#f8fafc; color:var(--text); outline:none;
+    }
+    input:focus,select:focus,textarea:focus{
+      box-shadow:var(--focus); border-color:#bfdbfe; background:#fff;
+    }
+    textarea{ min-height:110px; resize:vertical }
+
+    /* Readonly kilitli alan görünümü */
+    .locked{ background:#eef2ff; border-color:#c7d2fe; color:#374151 }
+    .lock-note{ font-size:12px; color:#6b7280; margin-top:4px }
+
+    /* Çoklu chip seçimleri */
+    .chips{ display:flex; flex-wrap:wrap; gap:10px; margin-top:6px }
+    .chip{
+      padding:8px 12px; border-radius:20px; border:var(--bd); background:var(--chip);
+      color:#0f172a; cursor:pointer; font-size:14px; user-select:none;
+    }
+    .chip.active{ background:var(--chip-active); color:#0b3ea6; outline:var(--focus); }
+    .chip input{ display:none }
+
+    .divider{ height:1px; background:linear-gradient(90deg,transparent,#e5e7eb,transparent); margin:18px 0 8px }
+
+    .actions{ display:flex; gap:12px; margin-top:18px; align-items:center; flex-wrap:wrap }
+    .btn{
+      padding:12px 18px; border-radius:12px; border:var(--bd);
+      cursor:pointer; font-weight:600; background:#fff; color:var(--text);
+    }
+    .btn.primary{ background:linear-gradient(135deg,var(--pri),var(--pri-2)); color:#fff; border:none }
+    .btn:hover{ filter:brightness(1.02) }
+    .btn.primary:hover{ filter:brightness(1.05) }
+
+    .checkbox{ display:flex; gap:10px; align-items:flex-start; margin:8px 0 }
+    .checkbox input{ transform:translateY(3px) }
+
+    .toast{
+      position:fixed; right:16px; bottom:16px; background:#fff; border:var(--bd);
+      border-radius:12px; padding:12px 14px; box-shadow:0 6px 18px rgba(0,0,0,.08);
+      display:none; max-width: 420px;
+    }
+    .toast.ok{ border-color:#bbf7d0 }
+    .toast.err{ border-color:#fecaca }
+    .toast strong{ display:block; margin-bottom:4px }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="/logo-robot.svg" alt="Satınalma CoPilot" onerror="this.style.display='none'">
+      <div class="h1">Genişletilmiş Kayıt</div>
+    </div>
+
+    <!-- 0) İlk adım özet (readonly) -->
+    <div class="card" id="firstStepSummary">
+      <h3 style="margin:4px 0 8px;">Ön Bilgiler (İlk Adım)</h3>
+      <div class="row">
+        <div>
+          <label>Ad Soyad</label>
+          <input id="fs_name" class="locked" type="text" readonly>
+          <div class="lock-note">İlk formdan geldi. Değiştirmek için geri dön.</div>
+        </div>
+        <div>
+          <label>E-posta</label>
+          <input id="fs_email" class="locked" type="email" readonly>
+          <div class="lock-note">İlk formdan geldi. Değiştirmek için geri dön.</div>
+        </div>
+        <div>
+          <label>WhatsApp Numarası</label>
+          <input id="fs_phone" class="locked" type="tel" readonly>
+        </div>
+        <div>
+          <label>Şirket Adı</label>
+          <input id="fs_company" class="locked" type="text" readonly>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1) Genişletilmiş alanlar -->
+    <form class="card" id="extendedForm" novalidate>
+      <h3 style="margin:4px 0 8px;">Şirket & Kullanım Detayları</h3>
+
+      <div class="row">
+        <div>
+          <label for="sector">Sektör *</label>
+          <select id="sector" name="sector" required>
+            <option value="" selected disabled>Seçiniz</option>
+            <option>Makine / İmalat</option>
+            <option>Gıda</option>
+            <option>Perakende</option>
+            <option>Enerji</option>
+            <option>Tekstil</option>
+            <option value="other">Diğer</option>
+          </select>
+          <input type="text" id="sector_other" placeholder="Sektörü yazın" style="display:none; margin-top:8px;">
+        </div>
+
+        <div>
+          <label for="size">Çalışan Sayısı *</label>
+          <select id="size" name="company_size" required>
+            <option value="" selected disabled>Seçiniz</option>
+            <option>1–10</option>
+            <option>11–50</option>
+            <option>51–200</option>
+            <option>201–500</option>
+            <option>500+</option>
+            <option value="other">Diğer</option>
+          </select>
+          <input type="text" id="size_other" placeholder="Örn. 1200" style="display:none; margin-top:8px;">
+        </div>
+
+        <div>
+          <label for="erp">Kullandığınız ERP/CRM</label>
+          <select id="erp" name="erp">
+            <option value="" selected>Seçiniz (opsiyonel)</option>
+            <option>Logo</option>
+            <option>Netsis</option>
+            <option>Nebim</option>
+            <option>MS Dynamics</option>
+            <option>SAP</option>
+            <option>Oracle</option>
+            <option value="other">Diğer</option>
+          </select>
+          <input type="text" id="erp_other" placeholder="ERP/CRM adını yazın" style="display:none; margin-top:8px;">
+          <div class="help">İleride entegrasyon için kullanacağız.</div>
+        </div>
+
+        <div>
+          <label for="ref">Referans Kodu</label>
+          <input id="ref" name="ref_code" type="text" placeholder="(opsiyonel)">
+        </div>
+      </div>
+
+      <label for="notes" style="margin-top:8px;">Notlar</label>
+      <textarea id="notes" name="notes" placeholder="Özel ihtiyaç / entegrasyon / tedarikçi verisi vs."></textarea>
+
+      <div class="divider"></div>
+
+      <label>Öncelikli Kullanım Senaryıları *</label>
+      <div class="help">En az birini seç.</div>
+      <div class="chips" id="usecases">
+        <!-- chip'lerin value’ları data-value’da -->
+        <label class="chip" data-value="AI RFQ / Hızlı Teklif"><input type="checkbox">AI RFQ / Hızlı Teklif</label>
+        <label class="chip" data-value="Tedarikçi Keşfi & Risk"><input type="checkbox">Tedarikçi Keşfi & Risk</label>
+        <label class="chip" data-value="Fiyat / Pazar Analizi"><input type="checkbox">Fiyat / Pazar Analizi</label>
+        <label class="chip" data-value="Sözleşme & Doküman Şablonları"><input type="checkbox">Sözleşme & Doküman Şablonları</label>
+        <label class="chip" data-value="WhatsApp / E-posta Otomasyonu"><input type="checkbox">WhatsApp / E-posta Otomasyonu</label>
+        <label class="chip" data-value="Sipariş & Teslimat Takibi"><input type="checkbox">Sipariş & Teslimat Takibi</label>
+        <label class="chip" data-value="Entegrasyonlar (Logo, SAP, vb.)"><input type="checkbox">Entegrasyonlar (Logo, SAP, vb.)</label>
+        <label class="chip" data-value="other"><input type="checkbox">Diğer</label>
+      </div>
+      <input type="text" id="usecase_other" placeholder="Senaryonuzu yazın" style="display:none; margin-top:10px;">
+
+      <div class="divider"></div>
+
+      <div class="checkbox">
+        <input id="terms" type="checkbox" required />
+        <label for="terms">Kullanım koşullarını kabul ediyorum. *</label>
+      </div>
+      <div class="checkbox">
+        <input id="marketing" type="checkbox" />
+        <label for="marketing">Ürün güncellemeleri ve kampanyalar hakkında e-posta/WhatsApp almak istiyorum.</label>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn" id="btnBack">Vazgeç</button>
+        <button type="submit" class="btn primary" id="btnSubmit">Kaydet ve Devam Et</button>
+      </div>
+      <div class="help">Kaydınız tamamlandıktan sonra WhatsApp asistanı için aktivasyon bağlantısı paylaşacağız.</div>
+    </form>
+  </div>
+
+  <div class="toast" id="toast"><strong></strong><span></span></div>
+
+  <script>
+    // ---- Yardımcılar ----
+    const $ = (sel, ctx=document) => ctx.querySelector(sel);
+    const $$ = (sel, ctx=document) => [...ctx.querySelectorAll(sel)];
+
+    function showToast(kind, title, msg){
+      const t = $('#toast');
+      t.className = 'toast ' + (kind || '');
+      t.querySelector('strong').textContent = title || '';
+      t.querySelector('span').textContent = msg || '';
+      t.style.display = 'block';
+      clearTimeout(showToast._h);
+      showToast._h = setTimeout(()=> t.style.display='none', 4200);
+    }
+
+    // ---- İlk form verilerini al (query -> postMessage -> localStorage sırayla) ----
+    const pref = {
+      name: '', email: '', phone: '', company: ''
+    };
+
+    // 1) URL query
+    const sp = new URLSearchParams(location.search);
+    pref.name = sp.get('name') || sp.get('ad') || '';
+    pref.email = sp.get('email') || '';
+    pref.phone = sp.get('phone') || sp.get('whatsapp') || '';
+    pref.company = sp.get('company') || sp.get('sirket') || '';
+
+    // 2) localStorage (önceki adım kaydetmiş olabilir)
+    try{
+      pref.name ||= localStorage.getItem('signup_name') || '';
+      pref.email ||= localStorage.getItem('signup_email') || '';
+      pref.phone ||= localStorage.getItem('signup_phone') || '';
+      pref.company ||= localStorage.getItem('signup_company') || '';
+    }catch(e){}
+
+    // 3) opener postMessage ile gelebilirse dinle (tek seferlik)
+    window.addEventListener('message',(ev)=>{
+      if(ev?.data?.type==='signup:firststep'){
+        Object.assign(pref, ev.data.payload||{});
+        fillFirstStep();
+      }
+    }, { once:true });
+
+    function fillFirstStep(){
+      $('#fs_name').value = pref.name || '';
+      $('#fs_email').value = pref.email || '';
+      $('#fs_phone').value = pref.phone || '';
+      $('#fs_company').value = pref.company || '';
+    }
+    fillFirstStep();
+
+    // ---- “Diğer” alan kontrolcüsü ----
+    function bindOther(selectEl, otherInputEl){
+      const toggle = () => {
+        const isOther = (selectEl.value === 'other');
+        otherInputEl.style.display = isOther ? '' : 'none';
+        otherInputEl.required = isOther;
+        if(!isOther){ otherInputEl.value=''; }
+      };
+      selectEl.addEventListener('change', toggle);
+      toggle();
+    }
+    bindOther($('#sector'), $('#sector_other'));
+    bindOther($('#size'), $('#size_other'));
+    bindOther($('#erp'), $('#erp_other'));
+
+    // ---- Chip toggle (use cases) + other input ----
+    const chipWrap = $('#usecases');
+    chipWrap.addEventListener('click', (e)=>{
+      const label = e.target.closest('.chip');
+      if(!label) return;
+      const box = label.querySelector('input[type="checkbox"]');
+      box.checked = !box.checked;
+      label.classList.toggle('active', box.checked);
+
+      const isOther = (label.dataset.value === 'other');
+      if(isOther){
+        const anyOtherActive = $$('.chip[data-value="other"] input', chipWrap)[0]?.checked;
+        const otherInput = $('#usecase_other');
+        otherInput.style.display = anyOtherActive ? '' : 'none';
+        otherInput.required = !!anyOtherActive;
+        if(!anyOtherActive) otherInput.value='';
+      }
+    });
+
+    // ---- Geri ----
+    $('#btnBack').addEventListener('click', ()=>{
+      history.length > 1 ? history.back() : location.href = '/';
+    });
+
+    // ---- Submit ----
+    $('#extendedForm').addEventListener('submit', async (ev)=>{
+      ev.preventDefault();
+
+      // Zorunlu: en az bir kullanım senaryısı
+      const selectedChips = $$('.chip input:checked', chipWrap).map(c => c.closest('.chip').dataset.value);
+      if(selectedChips.length === 0){
+        showToast('err','Eksik bilgi','En az bir kullanım senaryısı seçmelisiniz.');
+        return;
+      }
+
+      if(!$('#terms').checked){
+        showToast('err','Onay gerekli','Kullanım koşullarını kabul etmelisiniz.');
+        return;
+      }
+
+      // Sektör & diğerleri
+      const sector = $('#sector').value === 'other' ? $('#sector_other').value.trim() : $('#sector').value;
+      const company_size = $('#size').value === 'other' ? $('#size_other').value.trim() : $('#size').value;
+      const erp = $('#erp').value === 'other' ? $('#erp_other').value.trim() : $('#erp').value;
+
+      // Use case “Diğer”
+      const otherUC = $('#usecase_other').value.trim();
+      const use_cases = selectedChips
+        .filter(v => v !== 'other')
+        .concat( ($$('.chip[data-value="other"] input:checked', chipWrap).length && otherUC) ? [otherUC] : [] );
+
+      const payload = {
+        // ilk adım özet (backend de tekrar doğrulayabilir)
+        name: pref.name, email: pref.email, phone: pref.phone, company: pref.company,
+
+        // genişletilmiş alanlar
+        sector, company_size, erp,
+        ref_code: $('#ref').value.trim() || null,
+        notes: $('#notes').value.trim() || null,
+        use_cases,
+        marketing_opt_in: $('#marketing').checked
+      };
+
+      // API çağrısı
+      const API_BASE = (location.origin.includes('satinalmacopilot.com'))
+        ? 'https://api.satinalmacopilot.com'
+        : 'http://127.0.0.1:3001';
+
+      // Token alma (localStorage -> cookie Bearer)
+      let token = '';
+      try{ token = localStorage.getItem('auth_token') || ''; }catch(e){}
+      if(!token){
+        // basit cookie okuma
+        const m = document.cookie.match(/(?:^|;\s*)Bearer=([^;]+)/);
+        token = m ? decodeURIComponent(m[1]) : '';
+      }
+
+      try{
+        const res = await fetch(API_BASE + '/profile/extended', {
+          method:'POST',
+          headers:{
+            'Content-Type':'application/json',
+            ...(token ? { 'Authorization':'Bearer ' + token } : {})
+          },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json().catch(()=> ({}));
+
+        if(!res.ok || data.success === false){
+          const msg = data?.error || 'Kayıt sırasında bir hata oluştu.';
+          showToast('err','Hata', msg);
+          return;
+        }
+
+        showToast('ok','Kaydedildi','Bilgileriniz başarıyla güncellendi.');
+        // İsteğe bağlı: bir sonraki adıma yönlendir
+        setTimeout(()=>{
+          // Örn: onboarding devam sayfası
+          location.href = '/onboarding/next.html';
+        }, 900);
+      }catch(err){
+        console.error(err);
+        showToast('err','Ağ Hatası','Sunucuya ulaşılamadı. Lütfen tekrar deneyin.');
+      }
+    });
+
+    // İlk girişte chip'leri erişilebilir kıl
+    $$('.chip', chipWrap).forEach(ch => ch.setAttribute('role','checkbox'));
+  </script>
+</body>
+</html>
+

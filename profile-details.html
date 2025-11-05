@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detay Bilgilerim - Satınalma CoPilot</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E🤖%3C/text%3E%3C/svg%3E">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      color: #1e293b;
+      padding-bottom: 60px;
+    }
+
+    /* ========== Header ========== */
+    .header {
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+    }
+
+    .logo { font-size: 2rem; }
+
+    .brand-text {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #2563eb;
+    }
+
+    .back-btn {
+      padding: 10px 20px;
+      background: #f1f5f9;
+      color: #475569;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .back-btn:hover {
+      background: #e2e8f0;
+    }
+
+    /* ========== Container ========== */
+    .container {
+      max-width: 1200px;
+      margin: 32px auto;
+      padding: 0 24px;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .page-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 12px;
+    }
+
+    .page-subtitle {
+      font-size: 1.1rem;
+      color: #64748b;
+    }
+
+    /* ========== Form Sections ========== */
+    .form-section {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #f1f5f9;
+    }
+
+    .section-icon {
+      font-size: 1.8rem;
+    }
+
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    /* ========== Form Fields ========== */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .form-grid-full {
+      grid-column: 1 / -1;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #475569;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .form-label .optional {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: all 0.2s;
+      background: #f9fafb;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .form-textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .form-select {
+      cursor: pointer;
+    }
+
+    /* ========== Checkbox/Radio ========== */
+    .checkbox-group,
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .checkbox-item,
+    .radio-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      background: #f9fafb;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .checkbox-item:hover,
+    .radio-item:hover {
+      background: #f1f5f9;
+    }
+
+    .checkbox-item input,
+    .radio-item input {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    .checkbox-item label,
+    .radio-item label {
+      flex: 1;
+      cursor: pointer;
+      font-size: 0.95rem;
+      color: #475569;
+    }
+
+    /* ========== Action Buttons ========== */
+    .form-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 40px;
+      padding-top: 32px;
+      border-top: 2px solid #f1f5f9;
+    }
+
+    .btn {
+      padding: 16px 48px;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-secondary {
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    .btn-secondary:hover {
+      background: #e2e8f0;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* ========== Info Box ========== */
+    .info-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+
+    .info-box-text {
+      color: #1e40af;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* ========== Success Message ========== */
+    .success-message {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #d1fae5;
+      color: #065f46;
+      padding: 16px 24px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      font-weight: 600;
+      display: none;
+      animation: slideIn 0.3s ease;
+      z-index: 1000;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    /* ========== Responsive ========== */
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-actions {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .page-title {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-section" onclick="location.href='dashboard.html'">
+      <div class="logo">🤖</div>
+      <div class="brand-text">Satınalma CoPilot</div>
+    </div>
+    <a href="dashboard.html" class="back-btn">← Dashboard'a Dön</a>
+  </div>
+
+  <!-- Success Message -->
+  <div class="success-message" id="successMessage">
+    ✅ Bilgileriniz başarıyla kaydedildi!
+  </div>
+
+  <!-- Main Container -->
+  <div class="container">
+    
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1 class="page-title">📝 Detay Bilgilerim</h1>
+      <p class="page-subtitle">
+        Satınalma süreçlerinizde kullanılacak detay bilgilerinizi bu formdan güncelleyebilirsiniz.
+      </p>
+    </div>
+
+    <div class="info-box">
+      <div class="info-box-text">
+        💡 <strong>Bilgi:</strong> Bu formdaki tüm alanlar isteğe bağlıdır. Sadece doldurmak istediğiniz alanları doldurabilirsiniz. Daha fazla bilgi sağladıkça, WhatsApp asistanınız size daha iyi hizmet verebilecektir.
+      </div>
+    </div>
+
+    <form id="profileForm">
+      
+      <!-- 1. Şirket Bilgileri -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-icon">🏢</span>
+          <h2 class="section-title">Şirket Bilgileri</h2>
+        </div>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">
+              Şirket Ünvanı
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <input type="text" name="company_name" class="form-input" placeholder="Örn: ABC Teknoloji A.Ş.">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Şirket Türü
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <select name="company_type" class="form-select">
+              <option value="">Seçiniz</option>
+              <option value="a.s.">Anonim Şirket (A.Ş.)</option>
+              <option value="ltd.">Limited Şirket (Ltd. Şti.)</option>
+              <option value="komandit">Komandit Şirket</option>
+              <option value="sahis">Şahıs Şirketi</option>
+              <option value="kolektif">Kolektif Şirket</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Kuruluş Yılı
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <input type="number" name="founding_year" class="form-input" placeholder="Örn: 2010" min="1900" max="2025">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Çalışan Sayısı
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <select name="employee_count" class="form-select">
+              <option value="">Seçiniz</option>
+              <option value="1-10">1-10 kişi</option>
+              <option value="11-50">11-50 kişi</option>
+              <option value="51-200">51-200 kişi</option>
+              <option value="201-500">201-500 kişi</option>
+              <option value="501-1000">501-1000 kişi</option>
+              <option value="1000+">1000+ kişi</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Web Sitesi
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <input type="url" name="website" class="form-input" placeholder="https://www.sirketiniz.com">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              LinkedIn Profili
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <input type="url" name="linkedin" class="form-input" placeholder="https://linkedin.com/company/...">
+          </div>
+
+          <div class="form-group form-grid-full">
+            <label class="form-label">
+              Şirket Açıklaması
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <textarea name="company_description" class="form-textarea" placeholder="Şirketinizin faaliyet alanı ve hakkında kısa bir açıklama..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Adres Bilgileri -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-icon">📍</span>
+          <h2 class="section-title">Adres Bilgileri</h2>
+        </div>
+        
+        <div class="form-grid">
+          <div class="form-group form-grid-full">
+            <label class="form-label">
+              Adres
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <textarea name="address" class="form-textarea" placeholder="Mahalle, sokak, bina no..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              İl
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <input type="text" name="city" class="form-input" placeholder="Örn: İstanbul">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              İlçe
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <input type="text" name="district" class="form-input" placeholder="Örn: Kadıköy">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Posta Kodu
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <input type="text" name="postal_code" class="form-input" placeholder="Örn: 34100">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Ülke
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <input type="text" name="country" class="form-input" placeholder="Türkiye" value="Türkiye">
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Vergi ve Mali Bilgiler -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-icon">💰</span>
+          <h2 class="section-title">Vergi ve Mali Bilgiler</h2>
+        </div>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">
+              Vergi Dairesi
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <input type="text" name="tax_office" class="form-input" placeholder="Örn: Kadıköy Vergi Dairesi">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Vergi Numarası
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <input type="text" name="tax_number" class="form-input" placeholder="10 haneli vergi numarası">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              MERSIS No
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <input type="text" name="mersis_no" class="form-input" placeholder="16 haneli MERSIS numarası">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              KEP Adresi
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <input type="email" name="kep_address" class="form-input" placeholder="sirket@hs01.kep.tr">
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Banka Bilgileri -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-icon">🏦</span>
+          <h2 class="section-title">Banka Bilgileri</h2>
+        </div>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">
+              Banka Adı
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <input type="text" name="bank_name" class="form-input" placeholder="Örn: Ziraat Bankası">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Şube Adı
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <input type="text" name="bank_branch" class="form-input" placeholder="Örn: Kadıköy Şubesi">
+          </div>
+
+          <div class="form-group form-grid-full">
+            <label class="form-label">
+              IBAN
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <input type="text" name="iban" class="form-input" placeholder="TR00 0000 0000 0000 0000 0000 00" maxlength="32">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Hesap Sahibi Adı
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <input type="text" name="account_holder" class="form-input" placeholder="Hesap sahibinin adı">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Para Birimi Tercihi
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <select name="currency_preference" class="form-select">
+              <option value="">Seçiniz</option>
+              <option value="TRY">Türk Lirası (TRY)</option>
+              <option value="USD">Amerikan Doları (USD)</option>
+              <option value="EUR">Euro (EUR)</option>
+              <option value="GBP">İngiliz Sterlini (GBP)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Satınalma Departmanı Bilgileri -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-icon">🛒</span>
+          <h2 class="section-title">Satınalma Departmanı Bilgileri</h2>
+        </div>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">
+              Departman Yöneticisi
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <input type="text" name="procurement_manager" class="form-input" placeholder="Yöneticinin adı soyadı">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Departman E-posta
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <input type="email" name="procurement_email" class="form-input" placeholder="satinalma@sirket.com">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Departman Telefonu
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <input type="tel" name="procurement_phone" class="form-input" placeholder="+90 5XX XXX XX XX">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Departman Büyüklüğü
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <select name="procurement_team_size" class="form-select">
+              <option value="">Seçiniz</option>
+              <option value="1">1 kişi</option>
+              <option value="2-5">2-5 kişi</option>
+              <option value="6-10">6-10 kişi</option>
+              <option value="11-20">11-20 kişi</option>
+              <option value="20+">20+ kişi</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Aylık Ortalama Satınalma Hacmi
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <select name="monthly_procurement_volume" class="form-select">
+              <option value="">Seçiniz</option>
+              <option value="<10k">10.000 TL'den az</option>
+              <option value="10k-50k">10.000 - 50.000 TL</option>
+              <option value="50k-100k">50.000 - 100.000 TL</option>
+              <option value="100k-500k">100.000 - 500.000 TL</option>
+              <option value="500k-1m">500.000 - 1.000.000 TL</option>
+              <option value=">1m">1.000.000 TL'den fazla</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Onay Limiti
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <input type="text" name="approval_limit" class="form-input" placeholder="Örn: 50.000 TL">
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Sektör ve Faaliyet Alanı -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-icon">🏭</span>
+          <h2 class="section-title">Sektör ve Faaliyet Alanı</h2>
+        </div>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">
+              Ana Sektör
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <select name="industry" class="form-select">
+              <option value="">Seçiniz</option>
+              <option value="imalat">İmalat Sanayi</option>
+              <option value="inşaat">İnşaat ve Altyapı</option>
+              <option value="teknoloji">Bilişim ve Teknoloji</option>
+              <option value="gıda">Gıda ve İçecek</option>
+              <option value="tekstil">Tekstil ve Hazır Giyim</option>
+              <option value="otomotiv">Otomotiv</option>
+              <option value="enerji">Enerji</option>
+              <option value="sağlık">Sağlık</option>
+              <option value="eğitim">Eğitim</option>
+              <option value="perakende">Perakende</option>
+              <option value="lojistik">Lojistik ve Taşımacılık</option>
+              <option value="turizm">Turizm ve Otelcilik</option>
+              <option value="finans">Finans ve Bankacılık</option>
+              <option value="medya">Medya ve İletişim</option>
+              <option value="diğer">Diğer</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Alt Sektör
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <input type="text" name="sub_industry" class="form-input" placeholder="Örn: Elektronik Komponent İmalatı">
+          </div>
+
+          <div class="form-group form-grid-full">
+            <label class="form-label">
+              Ana Ürün/Hizmet Grupları
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <textarea name="main_products" class="form-textarea" placeholder="Şirketinizin ürettiği veya sattığı ana ürün/hizmet gruplarını yazın..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. Satınalma Tercihleri -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-icon">⚙️</span>
+          <h2 class="section-title">Satınalma Tercihleri</h2>
+        </div>
+        
+        <div class="form-grid">
+          <div class="form-group form-grid-full">
+            <label class="form-label">
+              Sık Satın Alınan Ürün/Hizmet Kategorileri
+              <span class="optional">(Birden fazla seçebilirsiniz)</span>
+            </label>
+            <div class="checkbox-group">
+              <div class="checkbox-item">
+                <input type="checkbox" id="cat_raw" name="categories[]" value="raw_materials">
+                <label for="cat_raw">Hammadde ve Yarı Mamul</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="cat_office" name="categories[]" value="office_supplies">
+                <label for="cat_office">Ofis Malzemeleri</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="cat_it" name="categories[]" value="it_equipment">
+                <label for="cat_it">Bilişim Ekipmanları</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="cat_packaging" name="categories[]" value="packaging">
+                <label for="cat_packaging">Ambalaj Malzemeleri</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="cat_mro" name="categories[]" value="mro">
+                <label for="cat_mro">Bakım-Onarım Malzemeleri (MRO)</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="cat_service" name="categories[]" value="services">
+                <label for="cat_service">Hizmet Alımları</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Tercih Edilen Teslimat Süresi
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <select name="preferred_delivery_time" class="form-select">
+              <option value="">Seçiniz</option>
+              <option value="same_day">Aynı gün</option>
+              <option value="1-3_days">1-3 iş günü</option>
+              <option value="1_week">1 hafta</option>
+              <option value="2_weeks">2 hafta</option>
+              <option value="1_month">1 ay</option>
+              <option value="flexible">Esnek</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Minimum Sipariş Tutarı
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <input type="text" name="min_order_amount" class="form-input" placeholder="Örn: 1.000 TL">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Tercih Edilen İletişim Kanalı
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <select name="preferred_communication" class="form-select">
+              <option value="">Seçiniz</option>
+              <option value="whatsapp">WhatsApp</option>
+              <option value="email">E-posta</option>
+              <option value="phone">Telefon</option>
+              <option value="platform">Platform Mesajlaşma</option>
+            </select>
+          </div>
+
+          <div class="form-group form-grid-full">
+            <label class="form-label">
+              Özel Satınalma Notları
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <textarea name="procurement_notes" class="form-textarea" placeholder="Satınalma süreçlerinizle ilgili özel notlar, tercihler veya gereksinimler..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8. Ödeme Tercihleri -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-icon">💳</span>
+          <h2 class="section-title">Ödeme Tercihleri</h2>
+        </div>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">
+              Tercih Edilen Ödeme Yöntemi
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <select name="payment_method" class="form-select">
+              <option value="">Seçiniz</option>
+              <option value="bank_transfer">Havale/EFT</option>
+              <option value="credit_card">Kredi Kartı</option>
+              <option value="check">Çek</option>
+              <option value="cash">Nakit</option>
+              <option value="open_account">Açık Hesap</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Tercih Edilen Ödeme Vadesi
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <select name="payment_term" class="form-select">
+              <option value="">Seçiniz</option>
+              <option value="cash">Peşin</option>
+              <option value="15_days">15 gün</option>
+              <option value="30_days">30 gün</option>
+              <option value="45_days">45 gün</option>
+              <option value="60_days">60 gün</option>
+              <option value="90_days">90 gün</option>
+              <option value="custom">Özel</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Fatura Tipi Tercihi
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <select name="invoice_type" class="form-select">
+              <option value="">Seçiniz</option>
+              <option value="e-invoice">E-Fatura</option>
+              <option value="e-archive">E-Arşiv Fatura</option>
+              <option value="paper">Kağıt Fatura</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Erken Ödeme İndirimi Tercihi
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <select name="early_payment_discount" class="form-select">
+              <option value="">Seçiniz</option>
+              <option value="yes">Evet, erken ödeme indirimi kullanırım</option>
+              <option value="no">Hayır</option>
+              <option value="depends">Duruma göre</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 9. Tedarikçi ve Kalite Tercihleri -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-icon">⭐</span>
+          <h2 class="section-title">Tedarikçi ve Kalite Tercihleri</h2>
+        </div>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">
+              Gerekli Kalite Sertifikaları
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <textarea name="required_certifications" class="form-textarea" placeholder="ISO 9001, CE, TSE vb."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Tedarikçi Konum Tercihi
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <select name="supplier_location_preference" class="form-select">
+              <option value="">Seçiniz</option>
+              <option value="local">Lokal (Aynı şehir)</option>
+              <option value="national">Ulusal</option>
+              <option value="international">Uluslararası</option>
+              <option value="no_preference">Tercih yok</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Garanti Süresi Beklentisi
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <select name="warranty_expectation" class="form-select">
+              <option value="">Seçiniz</option>
+              <option value="no_warranty">Garanti gerekli değil</option>
+              <option value="6_months">6 ay</option>
+              <option value="1_year">1 yıl</option>
+              <option value="2_years">2 yıl</option>
+              <option value="3_years">3 yıl ve üzeri</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Numune Talebi
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <select name="sample_requirement" class="form-select">
+              <option value="">Seçiniz</option>
+              <option value="always">Her zaman numune isterim</option>
+              <option value="sometimes">Bazen numune isterim</option>
+              <option value="rarely">Nadiren numune isterim</option>
+              <option value="never">Numune istemem</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 10. Diğer Bilgiler -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-icon">📋</span>
+          <h2 class="section-title">Diğer Bilgiler</h2>
+        </div>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">
+              Referans Kişi
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <input type="text" name="reference_person" class="form-input" placeholder="İsim Soyisim">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Referans Telefon
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <input type="tel" name="reference_phone" class="form-input" placeholder="+90 5XX XXX XX XX">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Sosyal Medya (LinkedIn)
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <input type="url" name="personal_linkedin" class="form-input" placeholder="https://linkedin.com/in/...">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Dil Tercihi
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <select name="language_preference" class="form-select">
+              <option value="tr">Türkçe</option>
+              <option value="en">İngilizce</option>
+              <option value="both">Her ikisi</option>
+            </select>
+          </div>
+
+          <div class="form-group form-grid-full">
+            <label class="form-label">
+              Ek Notlar
+              <span class="optional">(İsteğe bağlı)</span>
+            </label>
+            <textarea name="additional_notes" class="form-textarea" placeholder="Eklemek istediğiniz diğer bilgiler..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="location.href='dashboard.html'">
+          İptal Et
+        </button>
+        <button type="submit" class="btn btn-primary" id="submitBtn">
+          💾 Bilgileri Kaydet
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+  <script>
+    const API = 'https://api.satinalmacopilot.com';
+    const tok = localStorage.getItem('copilot_token');
+
+    // Check authentication
+    if (!tok) {
+      location.href = '/login.html?redirect=profile-details';
+    }
+
+    // Load existing profile data
+    async function loadProfileData() {
+      try {
+        const res = await fetch(`${API}/api/me`, {
+          headers: { Authorization: 'Bearer ' + tok }
+        });
+        
+        if (!res.ok) return;
+        
+        const data = await res.json();
+        const user = data.user || {};
+        
+        // Populate form with existing data
+        const form = document.getElementById('profileForm');
+        Object.keys(user).forEach(key => {
+          const input = form.elements[key];
+          if (input && user[key]) {
+            if (input.type === 'checkbox') {
+              input.checked = user[key];
+            } else {
+              input.value = user[key];
+            }
+          }
+        });
+      } catch (e) {
+        console.error('Load profile error:', e);
+      }
+    }
+
+    // Form submission
+    document.getElementById('profileForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = '💾 Kaydediliyor...';
+
+      try {
+        // Collect form data
+        const formData = new FormData(e.target);
+        const data = {};
+        
+        for (let [key, value] of formData.entries()) {
+          if (key.endsWith('[]')) {
+            // Handle checkbox arrays
+            const arrayKey = key.replace('[]', '');
+            if (!data[arrayKey]) data[arrayKey] = [];
+            data[arrayKey].push(value);
+          } else {
+            // Only include non-empty values
+            if (value && value.trim()) {
+              data[key] = value.trim();
+            }
+          }
+        }
+
+        // Send to API
+        const res = await fetch(`${API}/api/profile/update`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + tok
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+
+        if (result.success) {
+          // Show success message
+          const successMsg = document.getElementById('successMessage');
+          successMsg.style.display = 'block';
+          
+          setTimeout(() => {
+            successMsg.style.display = 'none';
+            // Redirect to dashboard
+            location.href = 'dashboard.html';
+          }, 2000);
+        } else {
+          throw new Error(result.error || 'Kayıt başarısız');
+        }
+
+      } catch (error) {
+        console.error('Submit error:', error);
+        alert('Hata: ' + error.message);
+        submitBtn.disabled = false;
+        submitBtn.textContent = '💾 Bilgileri Kaydet';
+      }
+    });
+
+    // Initialize
+    window.addEventListener('load', loadProfileData);
+  </script>
+</body>
+</html>

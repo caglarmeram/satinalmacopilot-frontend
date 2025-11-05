@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hakkımızda | Satınalma CoPilot</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E🤖%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;line-height:1.7;color:#0f172a;background:#fff}
+    .container{max-width:900px;margin:0 auto;padding:0 20px}
+
+    .navbar{background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.08);position:fixed;top:0;left:0;right:0;z-index:1000;padding:14px 0}
+    .nav-content{display:flex;justify-content:space-between;align-items:center}
+    .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;z-index:1001}
+    .logo{font-size:2rem}
+    .brand-text{font-size:1.5rem;font-weight:800;color:#2563eb}
+
+    /* Desktop Navigation */
+    .nav-links{display:flex;gap:16px;align-items:center}
+    .nav-btn{padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:600;transition:all .2s;font-size:.95rem;border:none;cursor:pointer;display:inline-block}
+    .btn-outline{background:white;color:#2563eb;border:2px solid #2563eb}
+    .btn-outline:hover{background:#eff6ff}
+    .btn-primary{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:white;box-shadow:0 4px 12px rgba(37,99,235,.3)}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(37,99,235,.4)}
+
+    /* Hamburger Menu */
+    .hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;z-index:1001}
+    .hamburger span{width:25px;height:3px;background:#2563eb;border-radius:3px;transition:all .3s ease}
+    .hamburger.active span:nth-child(1){transform:rotate(45deg) translate(8px,8px)}
+    .hamburger.active span:nth-child(2){opacity:0}
+    .hamburger.active span:nth-child(3){transform:rotate(-45deg) translate(7px,-7px)}
+
+    /* Mobile Menu */
+    .mobile-menu{display:none;position:fixed;top:70px;left:0;right:0;background:white;box-shadow:0 10px 30px rgba(0,0,0,.1);padding:0;flex-direction:column;gap:12px;max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease;z-index:999}
+    .mobile-menu.active{max-height:300px;padding:20px}
+    .mobile-menu a{width:100%;text-align:center;padding:14px;font-size:1rem}
+
+    /* Responsive */
+    @media (max-width:768px){
+      .nav-links{display:none}
+      .hamburger{display:flex}
+      .mobile-menu{display:flex}
+      .brand-text{font-size:1.2rem}
+    }
+
+    main{margin-top:80px;padding:40px 0 60px}
+    h1{font-size:2.5rem;font-weight:800;color:#0f172a;margin-bottom:30px;line-height:1.2}
+    h2{font-size:1.4rem;font-weight:700;color:#0f172a;margin:20px 0 12px}
+    p{margin-bottom:16px;color:#334155;font-size:1.05rem}
+    ul{margin:10px 0 20px 24px;color:#334155}
+    li{margin-bottom:8px}
+
+    .card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:24px;margin:20px 0}
+    .card h2{margin-top:0}
+
+    .highlight{background:linear-gradient(135deg,#f8fafc 0%,#e2e8f0 100%);padding:30px;border-radius:12px;margin:30px 0;text-align:center}
+    .highlight p{font-size:1.15rem;color:#475569;margin:0}
+
+    .page-nav{margin:30px 0;padding:20px;background:#f8fafc;border-radius:12px;display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+    .page-nav a{color:#2563eb;text-decoration:none;font-weight:600;padding:8px 16px;border-radius:8px;transition:background .2s}
+    .page-nav a:hover{background:#e2e8f0}
+
+    .footer{background:#0f172a;color:#fff;padding:28px 0;text-align:center}
+    .footer-brand{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:16px}
+    .footer-brand .logo{font-size:2rem}
+    .footer-brand .brand-text{font-size:1.3rem;font-weight:800;color:#fff}
+    .footer-links{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;margin:16px 0}
+    .footer-links a{color:#94a3b8;text-decoration:none}
+    .footer-links a:hover{color:#e2e8f0}
+    .footer-info{color:#64748b;font-size:.9rem;margin-top:12px}
+
+    @media (max-width:768px){
+      h1{font-size:2rem}
+      .card{padding:18px}
+      .page-nav{flex-direction:column;align-items:center}
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="container">
+      <div class="nav-content">
+        <a href="/" class="brand">
+          <div class="logo">🤖</div>
+          <div class="brand-text">Satınalma CoPilot</div>
+        </a>
+        
+        <!-- Desktop Navigation -->
+        <div class="nav-links">
+          <a href="/" class="nav-btn btn-outline">Ana Sayfa</a>
+          <a href="/login.html" class="nav-btn btn-primary">Giriş Yap</a>
+        </div>
+        
+        <!-- Hamburger -->
+        <button class="hamburger" onclick="toggleMenu()">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="/" class="nav-btn btn-outline">Ana Sayfa</a>
+      <a href="/login.html" class="nav-btn btn-primary">Giriş Yap</a>
+    </div>
+  </nav>
+
+  <main>
+    <div class="container">
+      <h1>Hakkımızda</h1>
+
+      <div class="highlight">
+        <p><strong>Satınalma CoPilot</strong>, işletmelerin satınalma süreçlerini hızlandıran WhatsApp tabanlı bir yapay zekâ asistanıdır. Tedarikçi keşfinden RFQ yönetimine, risk ve performans analizlerinden raporlamaya kadar tek sohbet ekranında çalışır.</p>
+      </div>
+
+      <div class="card">
+        <h2>🎯 Misyonumuz</h2>
+        <p>Satınalmayı herkes için daha hızlı, şeffaf ve ölçülebilir hâle getirmek. Yapay zeka destekli asistanımızla, karmaşık satınalma süreçlerini günlük sohbet kadar basit hale getiriyoruz.</p>
+      </div>
+
+      <div class="card">
+        <h2>🤖 Nasıl Çalışır?</h2>
+        <p>WhatsApp'tan talebinizi yazarsınız; asistanımız tedarikçileri tarar, teklif toplar, özetler ve raporlar. Her şey tanıdık WhatsApp arayüzünde gerçekleşir.</p>
+        <ul>
+          <li>Tedarikçi araştırması ve analizi</li>
+          <li>RFQ (Teklif Talebi) oluşturma ve yönetimi</li>
+          <li>Risk ve performans değerlendirmeleri</li>
+          <li>Fiyat karşılaştırmaları ve raporlar</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>✨ Neden Biz?</h2>
+        <ul>
+          <li><strong>Kolay kullanım:</strong> Herkesin bildiği WhatsApp üzerinden çalışır</li>
+          <li><strong>Kurulum gerektirmez:</strong> Anında başlayın, yazılım yüklemenize gerek yok</li>
+          <li><strong>Deneme süreci:</strong> 14 gün ücretsiz deneme ile risksiz başlarsınız</li>
+          <li><strong>Esnek fiyatlandırma:</strong> İhtiyacınız kadar kredi yükleyin</li>
+          <li><strong>Güvenli altyapı:</strong> Verileriniz şifreli ve korunmuş</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>🏢 Şirket Bilgileri</h2>
+        <p><strong>Back To Stylish LLC</strong> — Florida, ABD (EIN: 61-2244084)</p>
+        <p><strong>Teknoloji Ortakları:</strong></p>
+        <ul>
+          <li><strong>Ödemeler:</strong> Stripe (güvenli ödeme altyapısı)</li>
+          <li><strong>Barındırma:</strong> DigitalOcean (ABD/EU veri merkezleri)</li>
+          <li><strong>Mesajlaşma:</strong> Twilio (WhatsApp entegrasyonu)</li>
+        </ul>
+      </div>
+
+      <div class="page-nav">
+        <a href="/contact.html">İletişime Geçin</a>
+        <a href="/#pricing">Fiyatları Görün</a>
+        <a href="/">Ana Sayfa</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-brand">
+        <div class="logo">🤖</div>
+        <div class="brand-text">Satınalma CoPilot</div>
+      </div>
+      <div class="footer-links">
+        <a href="/about.html">Hakkımızda</a>
+        <a href="/#pricing">Fiyatlandırma</a>
+        <a href="/contact.html">İletişim</a>
+        <a href="/privacy.html">Gizlilik</a>
+        <a href="/terms.html">Kullanım Koşulları</a>
+        <a href="/faq.html">SSS</a>
+      </div>
+      <p class="footer-info">&copy; 2025 Back To Stylish LLC • EIN 61-2244084<br>806 NW 16th Ave Unit #216, Gainesville, FL 32601, USA</p>
+    </div>
+  </footer>
+
+<script>
+function toggleMenu(){const m=document.getElementById('mobileMenu'),h=document.querySelector('.hamburger');m.classList.toggle('active');h.classList.toggle('active')}
+document.addEventListener('click',function(e){const m=document.getElementById('mobileMenu'),h=document.querySelector('.hamburger');if(!e.target.closest('.navbar')){m.classList.remove('active');h.classList.remove('active')}});
+document.querySelectorAll('.mobile-menu a').forEach(l=>l.addEventListener('click',function(){const m=document.getElementById('mobileMenu'),h=document.querySelector('.hamburger');m.classList.remove('active');h.classList.remove('active')}));
+window.addEventListener('scroll',function(){const m=document.getElementById('mobileMenu'),h=document.querySelector('.hamburger');if(m.classList.contains('active')){m.classList.remove('active');h.classList.remove('active')}});
+</script>
+</body>
+</html>
