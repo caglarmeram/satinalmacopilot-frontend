@@ -1391,10 +1391,10 @@
         // Phone formatting helper function
         function formatPhoneNumber(phone) {
             if (!phone) return '';
-            
+
             // Remove all non-digit characters except +
             let cleaned = phone.replace(/[^\d+]/g, '');
-            
+
             // Turkish number handling
             if (cleaned.startsWith('0')) {
                 cleaned = '+90' + cleaned.substring(1);
@@ -1402,10 +1402,18 @@
                 cleaned = '+' + cleaned;
             } else if (cleaned.match(/^\d{10}$/)) {
                 cleaned = '+90' + cleaned;
-            } else if (!cleaned.startsWith('+') && cleaned.length > 10) {
+            } else if (!cleaned.startsWith('+')) {
+                // If no + prefix exists, add it
                 cleaned = '+' + cleaned;
             }
-            
+
+            // Final validation: ensure it's a valid international format
+            // Must be + followed by 10-15 digits
+            if (!/^\+\d{10,15}$/.test(cleaned)) {
+                console.warn('Invalid phone format after cleaning:', cleaned);
+                return phone; // Return original if cleaning failed
+            }
+
             return cleaned;
         }
 
@@ -1426,16 +1434,22 @@
             try {
                 // Get form data
                 const formData = new FormData(event.target);
+                const rawWhatsapp = formData.get('whatsapp')?.trim();
+                const formattedWhatsapp = formatPhoneNumber(rawWhatsapp);
+
+                console.log('Raw WhatsApp input:', rawWhatsapp);
+                console.log('Formatted WhatsApp:', formattedWhatsapp);
+
                 const registrationData = {
                     fullName: formData.get('fullName')?.trim(),
                     email: formData.get('email')?.trim(),
-                    whatsapp: formatPhoneNumber(formData.get('whatsapp')?.trim()),
+                    whatsapp: formattedWhatsapp,
                     company: formData.get('company')?.trim(),
                     selectedPlan: selectedPlan || 'pro',
                     billingCycle: currentBilling
                 };
-                
-                console.log('Registration data:', registrationData);
+
+                console.log('Registration data being sent:', registrationData);
                 
                 // Basic validation
                 if (!registrationData.fullName || !registrationData.email || 
@@ -1489,6 +1503,9 @@
                 showLoading('Kayıt oluşturuluyor...');
                 
                 // Create trial user via API
+                console.log('Sending registration request to:', `${API_BASE_URL}/api/register`);
+                console.log('Request payload:', JSON.stringify(registrationData, null, 2));
+
                 const response = await fetch(`${API_BASE_URL}/api/register`, {
                     method: 'POST',
                     headers: {
@@ -1497,10 +1514,15 @@
                     },
                     body: JSON.stringify(registrationData)
                 });
-                
+
+                console.log('Response status:', response.status);
+                console.log('Response headers:', [...response.headers.entries()]);
+
                 const result = await response.json();
+                console.log('Response body:', result);
+
                 hideLoading();
-                
+
                 if (response.ok && result.success) {
                     if (result.action === 'new_trial_started') {
                         alert(`Kaydınız başarıyla tamamlandı!\n\n14 günlük ücretsiz trial başladı\n1000 mesaj hediye\n5 dakika içinde WhatsApp'tan kurulum mesajı alacaksınız`);
@@ -1524,11 +1546,18 @@
                         alert(result.message || 'Kayıt başarıyla tamamlandı!');
                     }
                 } else {
-                    throw new Error(result.message || 'Kayıt işlemi başarısız oldu.');
+                    const errorMsg = result.error || result.message || 'Kayıt işlemi başarısız oldu.';
+                    console.error('API Error Response:', result);
+                    throw new Error(errorMsg);
                 }
-                
+
             } catch (error) {
                 console.error('Registration error:', error);
+                console.error('Error details:', {
+                    message: error.message,
+                    stack: error.stack,
+                    name: error.name
+                });
                 hideLoading();
                 alert(`Hata: ${error.message}\n\nDestek: info@satinalmacopilot.com`);
                 
