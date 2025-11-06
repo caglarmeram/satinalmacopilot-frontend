@@ -1441,19 +1441,19 @@
                 console.log('Formatted WhatsApp:', formattedWhatsapp);
 
                 const registrationData = {
-                    fullName: formData.get('fullName')?.trim(),
+                    name: formData.get('fullName')?.trim(),
                     email: formData.get('email')?.trim(),
-                    whatsapp: formattedWhatsapp,
-                    company: formData.get('company')?.trim(),
-                    selectedPlan: selectedPlan || 'pro',
-                    billingCycle: currentBilling
+                    contact_phone: formattedWhatsapp,
+                    company_name: formData.get('company')?.trim(),
+                    subscription_plan: selectedPlan || 'pro',
+                    billing_cycle: currentBilling
                 };
 
                 console.log('Registration data being sent:', registrationData);
                 
                 // Basic validation
-                if (!registrationData.fullName || !registrationData.email || 
-                    !registrationData.whatsapp || !registrationData.company) {
+                if (!registrationData.name || !registrationData.email ||
+                    !registrationData.contact_phone || !registrationData.company_name) {
                     throw new Error('Lütfen tüm zorunlu alanları doldurun.');
                 }
                 
@@ -1463,7 +1463,7 @@
                 }
                 
                 // Phone validation
-                if (!/^\+\d{10,15}$/.test(registrationData.whatsapp)) {
+                if (!/^\+\d{10,15}$/.test(registrationData.contact_phone)) {
                     throw new Error('Geçersiz telefon numarası formatı. Örnek: +90 555 123 45 67');
                 }
                 
@@ -1476,7 +1476,7 @@
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     },
-                    body: JSON.stringify({ phone: registrationData.whatsapp })
+                    body: JSON.stringify({ phone: registrationData.contact_phone })
                 });
                 
                 if (lookupResponse.ok) {
@@ -1537,7 +1537,7 @@
                         
                         // Redirect to success page
                         setTimeout(() => {
-                            window.location.href = `success.html?phone=${encodeURIComponent(registrationData.whatsapp)}&name=${encodeURIComponent(registrationData.fullName)}`;
+                            window.location.href = `success.html?phone=${encodeURIComponent(registrationData.contact_phone)}&name=${encodeURIComponent(registrationData.name)}`;
                         }, 2000);
                     } else if (result.action === 'trial_expired') {
                         alert(`Tekrar hoş geldiniz!\n\nÜcretsiz denemeniz sona ermiş\nDevam etmek için plan seçimi gerekli`);
@@ -1547,7 +1547,7 @@
                     alert(`Hoş geldiniz!\n\nTrial aboneliğiniz devam ediyor.\nWhatsApp asistanınız zaten aktif.`);
     
                     setTimeout(() => {
-                    window.location.href = `success.html?phone=${encodeURIComponent(registrationData.whatsapp)}&customer_id=${result.customer_id}`;
+                    window.location.href = `success.html?phone=${encodeURIComponent(registrationData.contact_phone)}&customer_id=${result.customer_id}`;
                     }, 2000);
     
                     } else {
