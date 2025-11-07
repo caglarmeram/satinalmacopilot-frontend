@@ -668,16 +668,45 @@
           });
         }
 
-        // Referral code (backend'de yok, boş bırak)
-        document.getElementById('referralCode').value = 'Yakında...';
-
-        // Referral stats
-        document.getElementById('referralCount').textContent = '0';
-        document.getElementById('referralBonus').textContent = '0';
+        // Load affiliate data
+        loadAffiliateData(user);
 
       } catch (error) {
         console.error('Dashboard load error:', error);
         showError('Veriler yüklenirken bir hata oluştu: ' + error.message);
+      }
+    }
+
+    // Load affiliate/referral data
+    async function loadAffiliateData(user) {
+      try {
+        // Check if user has referral code
+        if (user.referral_code) {
+          document.getElementById('referralCode').value = user.referral_code;
+        } else {
+          document.getElementById('referralCode').value = 'Henüz oluşturulmadı';
+        }
+
+        // Fetch affiliate overview to get real stats
+        // Note: This would work better with JWT auth, but using workaround for now
+        const phone = user.phone;
+        const overviewRes = await fetch(`${API_BASE}/api/user/profile?phone=${encodeURIComponent(phone)}`);
+
+        if (overviewRes.ok) {
+          const overviewData = await overviewRes.json();
+          // For now, set to 0 until we add proper stats endpoint
+          document.getElementById('referralCount').textContent = '0';
+          document.getElementById('referralBonus').textContent = user.bonus_balance || '0';
+        } else {
+          document.getElementById('referralCount').textContent = '0';
+          document.getElementById('referralBonus').textContent = '0';
+        }
+
+      } catch (error) {
+        console.warn('Affiliate data load failed:', error);
+        document.getElementById('referralCode').value = 'Yüklenemedi';
+        document.getElementById('referralCount').textContent = '0';
+        document.getElementById('referralBonus').textContent = '0';
       }
     }
 
