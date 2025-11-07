@@ -600,7 +600,7 @@
       }
 
       try {
-        const response = await fetch(`${API_BASE}/user/profile?phone=${encodeURIComponent(phone)}`);
+        const response = await fetch(`${API_BASE}/api/user/profile?phone=${encodeURIComponent(phone)}`);
 
         if (!response.ok) {
           throw new Error('Veri alınamadı');
