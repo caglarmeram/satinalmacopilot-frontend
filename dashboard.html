@@ -600,31 +600,31 @@
       }
 
       try {
-        const response = await fetch(`${API_BASE}/customer-info?phone=${encodeURIComponent(phone)}`);
-        
+        const response = await fetch(`${API_BASE}/user/profile?phone=${encodeURIComponent(phone)}`);
+
         if (!response.ok) {
           throw new Error('Veri alınamadı');
         }
 
         const data = await response.json();
-        
+
         if (!data.success) {
-          throw new Error(data.error || 'Bilinmeyen hata');
+          throw new Error(data.error || data.message || 'Bilinmeyen hata');
         }
 
-        const customer = data.customer;
-        
+        const user = data.user;
+
         // Session'ı güncelle
-        saveSession(phone, customer);
+        saveSession(phone, user);
 
         // Hide loading, show content
         document.getElementById('loadingState').style.display = 'none';
         document.getElementById('mainContent').style.display = 'block';
 
         // Kota bilgilerini göster
-        const monthlyQuota = customer.monthly_quota || 0;
-        const usedQuota = customer.used_quota || 0;
-        const remainingQuota = Math.max(0, monthlyQuota - usedQuota);
+        const monthlyQuota = user.quota?.monthly || 0;
+        const usedQuota = user.quota?.used || 0;
+        const remainingQuota = user.quota?.remaining || 0;
         const usagePercent = monthlyQuota > 0 ? Math.min(100, (usedQuota / monthlyQuota) * 100) : 0;
 
         document.getElementById('totalQuota').textContent = remainingQuota.toLocaleString('tr-TR');
@@ -633,20 +633,20 @@
         document.getElementById('progressBar').style.width = usagePercent + '%';
 
         // Hesap bilgileri
-        document.getElementById('userName').textContent = customer.name || '-';
-        document.getElementById('companyName').textContent = customer.company_name || '-';
-        document.getElementById('phoneNumber').textContent = customer.contact_phone || '-';
-        document.getElementById('userEmail').textContent = customer.email || '-';
+        document.getElementById('userName').textContent = user.name || '-';
+        document.getElementById('companyName').textContent = user.company || '-';
+        document.getElementById('phoneNumber').textContent = user.phone || '-';
+        document.getElementById('userEmail').textContent = user.email || '-';
 
         // Plan bilgisi
-        const planName = (customer.subscription_plan || 'basic').toUpperCase();
-        const billingCycle = customer.billing_cycle === 'yearly' ? 'Yıllık' : 'Aylık';
+        const planName = (user.subscription_plan || 'basic').toUpperCase();
+        const billingCycle = user.billing_cycle === 'yearly' ? 'Yıllık' : 'Aylık';
         document.getElementById('subscriptionPlan').textContent = `${planName} - ${billingCycle}`;
 
         // Status
         const statusBadge = document.getElementById('subscriptionStatus');
-        const status = customer.subscription_status || 'trial';
-        
+        const status = user.subscription_status || 'trial';
+
         if (status === 'active' || status === 'paid') {
           statusBadge.textContent = 'AKTİF';
           statusBadge.className = 'status-badge status-active';
@@ -659,8 +659,8 @@
         }
 
         // Plan end date
-        if (customer.plan_end_date) {
-          const endDate = new Date(customer.plan_end_date);
+        if (user.plan_end_date) {
+          const endDate = new Date(user.plan_end_date);
           document.getElementById('planEndDate').textContent = endDate.toLocaleDateString('tr-TR', {
             day: 'numeric',
             month: 'long',
@@ -668,9 +668,9 @@
           });
         }
 
-        // Referral code
-        document.getElementById('referralCode').value = customer.referral_code || 'Yükleniyor...';
-        
+        // Referral code (backend'de yok, boş bırak)
+        document.getElementById('referralCode').value = 'Yakında...';
+
         // Referral stats
         document.getElementById('referralCount').textContent = '0';
         document.getElementById('referralBonus').textContent = '0';
