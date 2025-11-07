@@ -4,7 +4,13 @@
       "Bash(ssh -o ConnectTimeout=10 -o ServerAliveInterval=5 root@157.173.219.213 \"cd ~/satinalmacopilot-backend && pwd && git status\")",
       "Bash(ssh-keyscan:*)",
       "Bash(~/.ssh/known_hosts)",
-      "Bash(ssh -o ConnectTimeout=10 root@157.173.219.213 \"cd ~/satinalmacopilot-backend && git pull origin main\")"
+      "Bash(ssh -o ConnectTimeout=10 root@157.173.219.213 \"cd ~/satinalmacopilot-backend && git pull origin main\")",
+      "Bash(git config:*)",
+      "Bash(ssh satinalma:*)",
+      "Bash(cat:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []

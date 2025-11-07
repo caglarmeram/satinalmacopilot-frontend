@@ -13,7 +13,8 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
+            echo "Starting frontend deployment..."
             cd /var/www/satinalmacopilot-frontend
             git pull origin main
-            sudo nginx -s reload
-            echo "Frontend updated successfully"
+            nginx -t && nginx -s reload
+            echo "Frontend deployment completed at $(date)"
