@@ -418,6 +418,7 @@
         // JWT'yi kaydet
         localStorage.setItem('copilot_token', data.token);
         localStorage.setItem('copilot_user', JSON.stringify(data.user));
+        localStorage.setItem('copilot_phone', phoneNumber);
 
         // Başarı ekranı
         showStep('step3');
@@ -431,7 +432,7 @@
             const selectedBilling = localStorage.getItem('selected_billing') || 'monthly';
             window.location.href = `/payment.html?plan=${selectedPlan}&billing=${selectedBilling}`;
           } else {
-            window.location.href = '/dashboard.html';
+            window.location.href = `/dashboard.html?phone=${encodeURIComponent(phoneNumber)}`;
           }
         }, 2000);
 

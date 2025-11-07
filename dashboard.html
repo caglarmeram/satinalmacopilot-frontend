@@ -567,17 +567,23 @@
       // URL'den phone parametresi varsa öncelikli kullan
       const params = new URLSearchParams(window.location.search);
       const urlPhone = params.get('phone');
-      
+
       if (urlPhone) {
         return urlPhone;
       }
-      
+
+      // localStorage'dan al
+      const storedPhone = localStorage.getItem('copilot_phone');
+      if (storedPhone) {
+        return storedPhone;
+      }
+
       // Session'dan al
       const session = getSession();
       if (session && session.phone) {
         return session.phone;
       }
-      
+
       return null;
     }
 
