@@ -426,6 +426,138 @@ function initEventHandlers() {
   };
 
   $('#pingBtn').onclick = ping;
+
+  // Metrics
+  $('#refreshMetrics').onclick = loadMetrics;
+
+  // Plans
+  $('#plansReload').onclick = loadPlans;
+  $('#saveReorder').onclick = async ()=>{
+    try{
+      const payload = [];
+      reorderState.forEach((display_order, key)=>{
+        const [plan_code, billing_cycle] = key.split('|');
+        payload.push({ plan_code, billing_cycle, display_order });
+      });
+      if(!payload.length){ $('#reorderMsg').textContent='Veri yok.'; return; }
+      await handleFetch(`${API_BASE}/api/admin/plans/reorder`,{
+        method:'PUT',
+        headers:{'Content-Type':'application/json','x-admin-token':ADMIN_TOKEN},
+        body: JSON.stringify(payload)
+      });
+      $('#reorderMsg').textContent='Kaydedildi.';
+      setTimeout(()=> $('#reorderMsg').textContent='',1500);
+      await loadPlans();
+    }catch(e){
+      $('#reorderMsg').textContent='Hata: '+e.message;
+    }
+  };
+
+  $('#upSave').onclick = ()=>{
+    if(upBusy) return;
+    clearTimeout(upTimer);
+    $('#upMsg').textContent = 'Gönderiliyor…';
+    upTimer = setTimeout(doUpsertPlan, 350);
+  };
+
+  // Affiliate
+  $('#affRefresh').onclick = loadAffiliate;
+  $('#affSaveSettings').onclick = async () => {
+    const signup = Number($('#affSignupBonus').value || 300);
+    const ratio = Number($('#affPaymentRatio').value || 10);
+    $('#affMsg').textContent = 'Affiliate ayarları app_settings tablosuna yazılmalı (backend endpoint gerekli)';
+    setTimeout(()=> $('#affMsg').textContent='', 3000);
+  };
+
+  // Email
+  $('#emailRefresh').onclick = loadEmails;
+  $('#createEmail').onclick = async () => {
+    const user = $('#newEmailUser').value.trim();
+    const pass = $('#newEmailPass').value;
+    const quota = Number($('#newEmailQuota').value) || 1024;
+
+    if (!user || !pass) {
+      $('#emailMsg').textContent = '❌ Kullanıcı adı ve şifre gerekli';
+      setTimeout(()=> $('#emailMsg').textContent='', 3000);
+      return;
+    }
+
+    if (pass.length < 8) {
+      $('#emailMsg').textContent = '❌ Şifre en az 8 karakter olmalı';
+      setTimeout(()=> $('#emailMsg').textContent='', 3000);
+      return;
+    }
+
+    $('#emailMsg').textContent = 'Oluşturuluyor...';
+    $('#createEmail').disabled = true;
+
+    try {
+      await handleFetch(`${API_BASE}/api/admin/emails`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-token': ADMIN_TOKEN
+        },
+        body: JSON.stringify({ username: user, password: pass, quota })
+      });
+
+      $('#emailMsg').textContent = '✅ Mailbox oluşturuldu';
+      $('#newEmailUser').value = '';
+      $('#newEmailPass').value = '';
+      $('#newEmailQuota').value = '1024';
+
+      setTimeout(()=> {
+        $('#emailMsg').textContent = '';
+        loadEmails();
+      }, 2000);
+
+    } catch(e) {
+      console.error('Create email error:', e);
+      $('#emailMsg').textContent = `❌ Hata: ${e.message}`;
+    } finally {
+      $('#createEmail').disabled = false;
+    }
+  };
+
+  // Audit
+  $('#auditSave').onclick = async ()=>{
+    try{
+      await handleFetch(`${API_BASE}/api/admin/audit`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-admin-token':ADMIN_TOKEN},
+        body: JSON.stringify({action: $('#auditAction').value, detail: $('#auditDetail').value})
+      });
+      alert('Audit kaydedildi.');
+      $('#auditAction').value=''; $('#auditDetail').value='';
+    }catch(e){ alert('Hata: '+e.message); }
+  };
+
+  // Testimonials
+  $('#tmClear').onclick = ()=>{
+    $('#tmId').value=''; $('#tmName').value=''; $('#tmTitle').value=''; $('#tmContent').value=''; $('#tmActive').checked=true;
+  };
+  $('#tmSave').onclick = saveTestimonial;
+
+  // Settings
+  $('#stReload').onclick = loadSettings;
+  $('#stSave').onclick = async ()=>{
+    try{
+      const payload = {
+        trial_days: Number($('#stTrialDays').value),
+        trial_quota: Number($('#stTrialQuota').value),
+        stripe_mode: $('#stStripeMode').value
+      };
+      await handleFetch(`${API_BASE}/api/admin/settings`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-admin-token':ADMIN_TOKEN},
+        body: JSON.stringify(payload)
+      });
+      $('#stMsg').textContent = 'Kaydedildi.';
+      setTimeout(()=> $('#stMsg').textContent='', 1500);
+    }catch(e){
+      $('#stMsg').textContent = 'Hata: '+e.message;
+    }
+  };
 }
 
 async function ping(){
@@ -454,7 +586,6 @@ document.querySelectorAll('.pill[data-tab]').forEach(t=>{
 });
 
 /* METRICS */
-$('#refreshMetrics').onclick = loadMetrics();
 async function loadMetrics(){
   try{
     const met = await handleFetch(`${API_BASE}/api/admin/metrics`, {
@@ -537,7 +668,6 @@ async function setQuota(customerId, quota){
 
 /* PLANS */
 let upBusy = false; let upTimer=null;
-$('#plansReload').onclick = loadPlans;
 const reorderState = new Map();
 
 async function loadPlans(){
@@ -592,34 +722,6 @@ async function loadPlans(){
   }
 }
 
-$('#saveReorder').onclick = async ()=>{
-  try{
-    const payload = [];
-    reorderState.forEach((display_order, key)=>{
-      const [plan_code, billing_cycle] = key.split('|');
-      payload.push({ plan_code, billing_cycle, display_order });
-    });
-    if(!payload.length){ $('#reorderMsg').textContent='Veri yok.'; return; }
-    await handleFetch(`${API_BASE}/api/admin/plans/reorder`,{
-      method:'PUT',
-      headers:{'Content-Type':'application/json','x-admin-token':ADMIN_TOKEN},
-      body: JSON.stringify(payload)
-    });
-    $('#reorderMsg').textContent='Kaydedildi.';
-    setTimeout(()=> $('#reorderMsg').textContent='',1500);
-    await loadPlans();
-  }catch(e){
-    $('#reorderMsg').textContent='Hata: '+e.message;
-  }
-};
-
-$('#upSave').onclick = ()=>{
-  if(upBusy) return;
-  clearTimeout(upTimer);
-  $('#upMsg').textContent = 'Gönderiliyor…';
-  upTimer = setTimeout(doUpsertPlan, 350);
-};
-
 async function doUpsertPlan(){upBusy = true; $('#upSave').disabled = true;
   try{
     const body = {
@@ -659,8 +761,6 @@ async function doUpsertPlan(){upBusy = true; $('#upSave').disabled = true;
 }
 
 /* AFFILIATE */
-$('#affRefresh').onclick = loadAffiliate;
-
 async function loadAffiliate(){
   try {
     const stats = await handleFetch(`${API_BASE}/api/admin/customers`, {
@@ -703,15 +803,7 @@ async function loadAffiliate(){
   }
 }
 
-$('#affSaveSettings').onclick = async () => {
-  const signup = Number($('#affSignupBonus').value || 300);
-  const ratio = Number($('#affPaymentRatio').value || 10);
-  $('#affMsg').textContent = 'Affiliate ayarları app_settings tablosuna yazılmalı (backend endpoint gerekli)';
-  setTimeout(()=> $('#affMsg').textContent='', 3000);
-};
-
 /* EMAIL MANAGEMENT */
-$('#emailRefresh').onclick = loadEmails;
 
 async function loadEmails(){
   const tbody = $('#emailTable tbody');
@@ -757,54 +849,6 @@ async function loadEmails(){
   }
 }
 
-$('#createEmail').onclick = async () => {
-  const user = $('#newEmailUser').value.trim();
-  const pass = $('#newEmailPass').value;
-  const quota = Number($('#newEmailQuota').value) || 1024;
-  
-  if (!user || !pass) {
-    $('#emailMsg').textContent = '❌ Kullanıcı adı ve şifre gerekli';
-    setTimeout(()=> $('#emailMsg').textContent='', 3000);
-    return;
-  }
-  
-  if (pass.length < 8) {
-    $('#emailMsg').textContent = '❌ Şifre en az 8 karakter olmalı';
-    setTimeout(()=> $('#emailMsg').textContent='', 3000);
-    return;
-  }
-  
-  $('#emailMsg').textContent = 'Oluşturuluyor...';
-  $('#createEmail').disabled = true;
-  
-  try {
-    await handleFetch(`${API_BASE}/api/admin/emails`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-admin-token': ADMIN_TOKEN
-      },
-      body: JSON.stringify({ username: user, password: pass, quota })
-    });
-    
-    $('#emailMsg').textContent = '✅ Mailbox oluşturuldu';
-    $('#newEmailUser').value = '';
-    $('#newEmailPass').value = '';
-    $('#newEmailQuota').value = '1024';
-    
-    setTimeout(()=> {
-      $('#emailMsg').textContent = '';
-      loadEmails();
-    }, 2000);
-    
-  } catch(e) {
-    console.error('Create email error:', e);
-    $('#emailMsg').textContent = `❌ Hata: ${e.message}`;
-  } finally {
-    $('#createEmail').disabled = false;
-  }
-};
-
 async function resetEmailPassword(email) {
   const newPass = prompt(`Yeni şifre (${email}):`, '');
   if (!newPass || newPass.length < 8) {
@@ -846,24 +890,9 @@ async function deleteEmail(email) {
 }
 
 /* AUDIT */
-$('#auditSave').onclick = async ()=>{
-  try{
-    await handleFetch(`${API_BASE}/api/admin/audit`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-admin-token':ADMIN_TOKEN},
-      body: JSON.stringify({action: $('#auditAction').value, detail: $('#auditDetail').value})
-    });
-    alert('Audit kaydedildi.');
-    $('#auditAction').value=''; $('#auditDetail').value='';
-  }catch(e){ alert('Hata: '+e.message); }
-};
+/* (onclick handlers moved to initEventHandlers) */
 
 /* TESTIMONIALS */
-$('#tmClear').onclick = ()=>{
-  $('#tmId').value=''; $('#tmName').value=''; $('#tmTitle').value=''; $('#tmContent').value=''; $('#tmActive').checked=true;
-};
-
-$('#tmSave').onclick = saveTestimonial;
 
 async function loadTestimonials(){
   const tbody = $('#tmTable tbody'); tbody.innerHTML='';
@@ -946,27 +975,6 @@ async function loadSettings(){
     $('#stMsg').textContent = 'Hata: '+e.message;
   }
 }
-
-$('#stReload').onclick = loadSettings;
-
-$('#stSave').onclick = async ()=>{
-  try{
-    const payload = {
-      trial_days: Number($('#stTrialDays').value),
-      trial_quota: Number($('#stTrialQuota').value),
-      stripe_mode: $('#stStripeMode').value
-    };
-    await handleFetch(`${API_BASE}/api/admin/settings`, {
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-admin-token':ADMIN_TOKEN},
-      body: JSON.stringify(payload)
-    });
-    $('#stMsg').textContent = 'Kaydedildi.';
-    setTimeout(()=> $('#stMsg').textContent='', 1500);
-  }catch(e){
-    $('#stMsg').textContent = 'Hata: '+e.message;
-  }
-};
 
 /* UTILS */
 function escapeHtml(s=''){
