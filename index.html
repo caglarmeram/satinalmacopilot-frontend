@@ -1441,6 +1441,9 @@
         
         // Initialize Stripe on page load
         document.addEventListener('DOMContentLoaded', function() {
+            // Load trial info from backend
+            loadTrialInfo();
+
             // Initialize Stripe
             if (window.Stripe && STRIPE_PUBLISHABLE_KEY) {
                 stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
@@ -1850,6 +1853,36 @@
             const hamburger = document.querySelector('.hamburger');
             menu.classList.toggle('open');
             hamburger.classList.toggle('active');
+        }
+
+        // Load trial information from backend and update UI
+        async function loadTrialInfo() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/trial-info`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const trialDays = data.trial_days || 14;
+                    const trialQuota = data.trial_quota || 1000;
+
+                    // Update all instances of "14 Gün" and "1000 mesaj" in the DOM
+                    document.querySelectorAll('h2, h3, p').forEach(element => {
+                        if (element.textContent.includes('14 Gün Ücretsiz Denemeye Başla')) {
+                            element.textContent = element.textContent.replace('14 Gün', `${trialDays} Gün`);
+                        }
+                        if (element.textContent.includes('1000 mesaj hediye')) {
+                            element.textContent = element.textContent.replace('1000 mesaj', `${trialQuota} mesaj`);
+                        }
+                    });
+
+                    console.log(`✅ Trial info loaded: ${trialDays} days, ${trialQuota} messages`);
+                } else {
+                    console.warn('Failed to load trial info, using defaults');
+                }
+            } catch (error) {
+                console.error('Error loading trial info:', error);
+                // Fallback to defaults (already in HTML)
+            }
         }
     </script>
 </body>
