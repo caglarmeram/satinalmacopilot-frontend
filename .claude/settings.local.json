@@ -16,7 +16,8 @@
       "Bash(md5sum:*)",
       "Bash(/c/Code/frontend/success.html)",
       "Bash(/c/Code/frontend/payment.html)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(/c/Code/backend/routes/admin.js)"
     ],
     "deny": [],
     "ask": []
