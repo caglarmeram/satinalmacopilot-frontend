@@ -12,7 +12,11 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(gh run list:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(md5sum:*)",
+      "Bash(/c/Code/frontend/success.html)",
+      "Bash(/c/Code/frontend/payment.html)",
+      "Bash(git pull:*)"
     ],
     "deny": [],
     "ask": []
