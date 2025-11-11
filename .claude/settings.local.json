@@ -17,7 +17,8 @@
       "Bash(/c/Code/frontend/success.html)",
       "Bash(/c/Code/frontend/payment.html)",
       "Bash(git pull:*)",
-      "Bash(/c/Code/backend/routes/admin.js)"
+      "Bash(/c/Code/backend/routes/admin.js)",
+      "Bash(ssh:*)"
     ],
     "deny": [],
     "ask": []
