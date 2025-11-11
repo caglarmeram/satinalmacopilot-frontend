@@ -946,26 +946,30 @@ async function loadSettings(){
   }
 }
 
-$('#stReload').onclick = loadSettings;
+document.addEventListener('DOMContentLoaded', () => {
+  if ($('#stReload')) $('#stReload').onclick = loadSettings;
 
-$('#stSave').onclick = async ()=>{
-  try{
-    const payload = {
-      trial_days: Number($('#stTrialDays').value),
-      trial_quota: Number($('#stTrialQuota').value),
-      stripe_mode: $('#stStripeMode').value
+  if ($('#stSave')) {
+    $('#stSave').onclick = async ()=>{
+      try{
+        const payload = {
+          trial_days: Number($('#stTrialDays').value),
+          trial_quota: Number($('#stTrialQuota').value),
+          stripe_mode: $('#stStripeMode').value
+        };
+        await handleFetch(`${API_BASE}/api/admin/settings`, {
+          method:'POST',
+          headers:{'Content-Type':'application/json','x-admin-token':ADMIN_TOKEN},
+          body: JSON.stringify(payload)
+        });
+        $('#stMsg').textContent = 'Kaydedildi.';
+        setTimeout(()=> $('#stMsg').textContent='', 1500);
+      }catch(e){
+        $('#stMsg').textContent = 'Hata: '+e.message;
+      }
     };
-    await handleFetch(`${API_BASE}/api/admin/settings`, {
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-admin-token':ADMIN_TOKEN},
-      body: JSON.stringify(payload)
-    });
-    $('#stMsg').textContent = 'Kaydedildi.';
-    setTimeout(()=> $('#stMsg').textContent='', 1500);
-  }catch(e){
-    $('#stMsg').textContent = 'Hata: '+e.message;
   }
-};
+});
 
 /* UTILS */
 function escapeHtml(s=''){
