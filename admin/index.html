@@ -413,18 +413,20 @@ function setStatus(ok){
   p.className='pill '+(ok?'':'bad');
 }
 
-$('#apiBase').value = API_BASE;
-$('#adminToken').value = ADMIN_TOKEN;
+function initEventHandlers() {
+  $('#apiBase').value = API_BASE;
+  $('#adminToken').value = ADMIN_TOKEN;
 
-$('#saveBar').onclick = async ()=>{
-  API_BASE = $('#apiBase').value.trim() || DEFAULT_API_BASE;
-  ADMIN_TOKEN = $('#adminToken').value.trim();
-  localStorage.setItem('apiBase', API_BASE);
-  localStorage.setItem('adminToken', ADMIN_TOKEN);
-  await ping();
-};
+  $('#saveBar').onclick = async ()=>{
+    API_BASE = $('#apiBase').value.trim() || DEFAULT_API_BASE;
+    ADMIN_TOKEN = $('#adminToken').value.trim();
+    localStorage.setItem('apiBase', API_BASE);
+    localStorage.setItem('adminToken', ADMIN_TOKEN);
+    await ping();
+  };
 
-$('#pingBtn').onclick = ping;
+  $('#pingBtn').onclick = ping;
+}
 
 async function ping(){
   try{
@@ -432,7 +434,6 @@ async function ping(){
     setStatus(j?.success===true);
   }catch(e){ console.error(e); setStatus(false); }
 }
-ping();
 
 /* TABS */
 document.querySelectorAll('.pill[data-tab]').forEach(t=>{
@@ -946,30 +947,26 @@ async function loadSettings(){
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  if ($('#stReload')) $('#stReload').onclick = loadSettings;
+$('#stReload').onclick = loadSettings;
 
-  if ($('#stSave')) {
-    $('#stSave').onclick = async ()=>{
-      try{
-        const payload = {
-          trial_days: Number($('#stTrialDays').value),
-          trial_quota: Number($('#stTrialQuota').value),
-          stripe_mode: $('#stStripeMode').value
-        };
-        await handleFetch(`${API_BASE}/api/admin/settings`, {
-          method:'POST',
-          headers:{'Content-Type':'application/json','x-admin-token':ADMIN_TOKEN},
-          body: JSON.stringify(payload)
-        });
-        $('#stMsg').textContent = 'Kaydedildi.';
-        setTimeout(()=> $('#stMsg').textContent='', 1500);
-      }catch(e){
-        $('#stMsg').textContent = 'Hata: '+e.message;
-      }
+$('#stSave').onclick = async ()=>{
+  try{
+    const payload = {
+      trial_days: Number($('#stTrialDays').value),
+      trial_quota: Number($('#stTrialQuota').value),
+      stripe_mode: $('#stStripeMode').value
     };
+    await handleFetch(`${API_BASE}/api/admin/settings`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-admin-token':ADMIN_TOKEN},
+      body: JSON.stringify(payload)
+    });
+    $('#stMsg').textContent = 'Kaydedildi.';
+    setTimeout(()=> $('#stMsg').textContent='', 1500);
+  }catch(e){
+    $('#stMsg').textContent = 'Hata: '+e.message;
   }
-});
+};
 
 /* UTILS */
 function escapeHtml(s=''){
@@ -979,7 +976,11 @@ function escapeHtml(s=''){
 }
 
 /* FIRST LOAD */
-loadMetrics();
+window.addEventListener('DOMContentLoaded', () => {
+  initEventHandlers();
+  ping();
+  loadMetrics();
+});
 </script>
 </body>
 </html>
