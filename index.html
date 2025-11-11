@@ -1626,13 +1626,18 @@
                 console.log('Raw WhatsApp input:', rawWhatsapp);
                 console.log('Formatted WhatsApp:', formattedWhatsapp);
 
+                // Check for referral code in URL (e.g., ?ref=WEBX1EIN)
+                const urlParams = new URLSearchParams(window.location.search);
+                const referralCode = urlParams.get('ref');
+
                 const registrationData = {
                     name: formData.get('fullName')?.trim(),
                     email: formData.get('email')?.trim(),
                     contact_phone: formattedWhatsapp,
                     company_name: formData.get('company')?.trim(),
                     subscription_plan: selectedPlan || 'pro',
-                    billing_cycle: currentBilling
+                    billing_cycle: currentBilling,
+                    referral_code: referralCode || null // NEW: Include referral code if present
                 };
 
                 console.log('Registration data being sent:', registrationData);
@@ -1719,8 +1724,17 @@
 
                 if (response.ok && result.success) {
                     if (result.action === 'new_trial_started') {
-                        alert(`Kaydınız başarıyla tamamlandı!\n\n14 günlük ücretsiz trial başladı\n1000 mesaj hediye\n5 dakika içinde WhatsApp'tan kurulum mesajı alacaksınız`);
-                        
+                        // Build success message
+                        let successMessage = `Kaydınız başarıyla tamamlandı!\n\n14 günlük ücretsiz trial başladı\n1000 mesaj hediye`;
+
+                        // Add referral bonus info if applicable
+                        if (result.customer?.referral_applied && result.customer?.bonus_received > 0) {
+                            successMessage += `\n🎁 Referans bonusu: +${result.customer.bonus_received} mesaj!`;
+                        }
+
+                        successMessage += `\n\n5 dakika içinde WhatsApp'tan kurulum mesajı alacaksınız`;
+                        alert(successMessage);
+
                         // Redirect to success page
                         setTimeout(() => {
                             window.location.href = `success.html?phone=${encodeURIComponent(registrationData.contact_phone)}&name=${encodeURIComponent(registrationData.name)}`;
