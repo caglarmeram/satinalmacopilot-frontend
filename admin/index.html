@@ -470,54 +470,57 @@ function initEventHandlers() {
   };
 
   // Email
-  $('#emailRefresh').onclick = loadEmails;
-  $('#createEmail').onclick = async () => {
-    const user = $('#newEmailUser').value.trim();
-    const pass = $('#newEmailPass').value;
-    const quota = Number($('#newEmailQuota').value) || 1024;
+  if ($('#emailRefresh')) $('#emailRefresh').onclick = loadEmails;
 
-    if (!user || !pass) {
-      $('#emailMsg').textContent = '❌ Kullanıcı adı ve şifre gerekli';
-      setTimeout(()=> $('#emailMsg').textContent='', 3000);
-      return;
-    }
+  if ($('#createEmail')) {
+    $('#createEmail').onclick = async () => {
+      const user = $('#newEmailUser').value.trim();
+      const pass = $('#newEmailPass').value;
+      const quota = Number($('#newEmailQuota').value) || 1024;
 
-    if (pass.length < 8) {
-      $('#emailMsg').textContent = '❌ Şifre en az 8 karakter olmalı';
-      setTimeout(()=> $('#emailMsg').textContent='', 3000);
-      return;
-    }
+      if (!user || !pass) {
+        $('#emailMsg').textContent = '❌ Kullanıcı adı ve şifre gerekli';
+        setTimeout(()=> $('#emailMsg').textContent='', 3000);
+        return;
+      }
 
-    $('#emailMsg').textContent = 'Oluşturuluyor...';
-    $('#createEmail').disabled = true;
+      if (pass.length < 8) {
+        $('#emailMsg').textContent = '❌ Şifre en az 8 karakter olmalı';
+        setTimeout(()=> $('#emailMsg').textContent='', 3000);
+        return;
+      }
 
-    try {
-      await handleFetch(`${API_BASE}/api/admin/emails`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-admin-token': ADMIN_TOKEN
-        },
-        body: JSON.stringify({ username: user, password: pass, quota })
-      });
+      $('#emailMsg').textContent = 'Oluşturuluyor...';
+      $('#createEmail').disabled = true;
 
-      $('#emailMsg').textContent = '✅ Mailbox oluşturuldu';
-      $('#newEmailUser').value = '';
-      $('#newEmailPass').value = '';
-      $('#newEmailQuota').value = '1024';
+      try {
+        await handleFetch(`${API_BASE}/api/admin/emails`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-admin-token': ADMIN_TOKEN
+          },
+          body: JSON.stringify({ username: user, password: pass, quota })
+        });
 
-      setTimeout(()=> {
-        $('#emailMsg').textContent = '';
-        loadEmails();
-      }, 2000);
+        $('#emailMsg').textContent = '✅ Mailbox oluşturuldu';
+        $('#newEmailUser').value = '';
+        $('#newEmailPass').value = '';
+        $('#newEmailQuota').value = '1024';
 
-    } catch(e) {
-      console.error('Create email error:', e);
-      $('#emailMsg').textContent = `❌ Hata: ${e.message}`;
-    } finally {
-      $('#createEmail').disabled = false;
-    }
-  };
+        setTimeout(()=> {
+          $('#emailMsg').textContent = '';
+          loadEmails();
+        }, 2000);
+
+      } catch(e) {
+        console.error('Create email error:', e);
+        $('#emailMsg').textContent = `❌ Hata: ${e.message}`;
+      } finally {
+        $('#createEmail').disabled = false;
+      }
+    };
+  }
 
   // Audit
   $('#auditSave').onclick = async ()=>{
